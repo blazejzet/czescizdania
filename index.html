@@ -1,0 +1,1291 @@
+<meta charset="utf-8">
+<title>Pajęczynka zdania</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Caveat:wght@600;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,600;1,7..72,500&display=swap">
+<style>
+:root{
+  --paper:#EEF2F6; --grid:rgba(70,110,160,.075); --card:#FFFFFF; --ink:#18202C; --muted:#5A6576;
+  --line:#D3DBE5; --hover:#E6EDF6; --selbg:#FFEFA8; --selink:#6E5400;
+  --good:#23804A; --bad:#C8352B;
+  --c-o:#B3265E; --c-s:#1F58B0; --c-d:#0B7F7A; --c-k:#A86300; --c-a:#6F45B5;
+  --p1:#DCE7F8; --p1b:#1F58B0; --p2:#FBE3C4; --p2b:#A86300; --p3:#E7DCF6; --p3b:#6F45B5;
+  --f-ui:"Atkinson Hyperlegible", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-text:"Literata", Georgia, "Times New Roman", serif;
+  --f-hand:"Caveat", "Comic Sans MS", cursive;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#10151D; --grid:rgba(140,170,210,.05); --card:#171E29; --ink:#E7ECF3; --muted:#9AA6B6;
+    --line:#2A3443; --hover:#222C3A; --selbg:#4A3F12; --selink:#F2D36B; --good:#5CCB85; --bad:#FF6F61;
+    --c-o:#F0719F; --c-s:#74A6F2; --c-d:#3FC7C0; --c-k:#F0AE45; --c-a:#B58DF2;
+    --p1:#1D3150; --p1b:#74A6F2; --p2:#43300F; --p2b:#F0AE45; --p3:#33254C; --p3b:#B58DF2;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#10151D; --grid:rgba(140,170,210,.05); --card:#171E29; --ink:#E7ECF3; --muted:#9AA6B6;
+  --line:#2A3443; --hover:#222C3A; --selbg:#4A3F12; --selink:#F2D36B; --good:#5CCB85; --bad:#FF6F61;
+  --c-o:#F0719F; --c-s:#74A6F2; --c-d:#3FC7C0; --c-k:#F0AE45; --c-a:#B58DF2;
+  --p1:#1D3150; --p1b:#74A6F2; --p2:#43300F; --p2b:#F0AE45; --p3:#33254C; --p3b:#B58DF2;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{
+  margin:0; background-color:var(--paper); color:var(--ink); font:16px/1.5 var(--f-ui);
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:24px 24px; padding:0 16px;
+}
+.wrap{max-width:920px; margin:0 auto; padding-block:20px 48px; display:grid; gap:20px}
+button{font:inherit; color:inherit}
+:focus-visible{outline:2.5px solid var(--c-s); outline-offset:2px}
+
+/* header */
+.top{display:flex; flex-wrap:wrap; justify-content:space-between; align-items:flex-end; gap:12px 24px}
+.brand h1{margin:0; font:600 clamp(1.7rem,4vw,2.3rem)/1.05 var(--f-text); letter-spacing:-.01em}
+.brand h1 em{font-weight:500; color:var(--c-o)}
+.brand p{margin:4px 0 0; color:var(--muted); font-size:.9rem}
+.scorebox{display:flex; align-items:flex-end; gap:18px; flex-wrap:wrap}
+.score{position:relative; font:700 2.8rem/1 var(--f-hand); font-variant-numeric:tabular-nums; min-width:3ch; text-align:right}
+.score .pts{font-size:1.2rem; margin-left:4px; color:var(--muted)}
+.delta{position:absolute; right:0; top:-18px; font:700 1.6rem/1 var(--f-hand); opacity:0; pointer-events:none}
+.delta.up{color:var(--good); animation:rise 1s ease-out}
+.delta.down{color:var(--bad); animation:rise 1s ease-out}
+@keyframes rise{0%{opacity:1; transform:translateY(8px)}100%{opacity:0; transform:translateY(-18px)}}
+.meta{display:flex; gap:14px; color:var(--muted); font-size:.85rem; padding-bottom:4px}
+.meta b{color:var(--ink); font-variant-numeric:tabular-nums}
+
+/* card */
+.card{background:var(--card); border:1px solid var(--line); border-radius:10px; padding:clamp(16px,3.5vw,32px);
+  box-shadow:0 1px 0 var(--line), 0 12px 30px -18px rgba(20,40,70,.25); display:grid; gap:14px}
+.taskhead{display:flex; flex-wrap:wrap; align-items:center; gap:8px 12px}
+.chip{font-size:.72rem; font-weight:700; letter-spacing:.09em; text-transform:uppercase; color:var(--muted)}
+.return{font:700 1.15rem/1 var(--f-hand); color:var(--bad); transform:rotate(-3deg)}
+.steps{display:flex; gap:6px; flex-wrap:wrap; margin-left:auto}
+.st{font-size:.72rem; padding:2px 8px; border-radius:4px; border:1px solid var(--line); color:var(--muted); white-space:nowrap}
+.st.cur{border-color:var(--ink); color:var(--ink); font-weight:700}
+.st.ok{border-color:transparent; background:color-mix(in srgb,var(--good) 16%,transparent); color:var(--good)}
+.st.bad{border-color:transparent; background:color-mix(in srgb,var(--bad) 16%,transparent); color:var(--bad)}
+#prompt{margin:0; font:600 clamp(1.25rem,3vw,1.6rem)/1.2 var(--f-text); text-wrap:balance}
+.hint{margin:-6px 0 0; color:var(--muted); font-size:.92rem; max-width:65ch}
+
+/* sentence */
+.sentence{font:400 clamp(1.35rem,4.4vw,2rem)/2.5 var(--f-text); padding:6px 0 14px; border-bottom:1px dashed var(--line); word-spacing:.06em}
+.tk{white-space:nowrap}
+.w{position:relative; border-radius:5px; padding:0 .1em; transition:background-color .15s}
+.w.click{cursor:pointer}
+.w.click:hover{background:var(--hover)}
+.w.sel{background:var(--selbg); color:var(--selink)}
+.w[data-t]{color:var(--tc); text-decoration-line:underline; text-decoration-color:var(--tc); text-decoration-thickness:2px; text-underline-offset:.3em}
+.w[data-t="o"]{--tc:var(--c-o); text-decoration-style:double; text-decoration-thickness:1.5px}
+.w[data-t="s"]{--tc:var(--c-s); text-decoration-style:solid}
+.w[data-t="d"]{--tc:var(--c-d); text-decoration-style:dashed}
+.w[data-t="k"]{--tc:var(--c-k); text-decoration-style:dotted; text-decoration-thickness:3px}
+.w[data-t="a"]{--tc:var(--c-a); text-decoration-style:wavy; text-decoration-thickness:1.5px}
+.w[data-lab]::after{content:attr(data-lab); position:absolute; left:50%; top:calc(100% - .55em); transform:translateX(-50%);
+  font:700 .34em/1 var(--f-ui); letter-spacing:.07em; text-transform:uppercase; color:var(--tc); white-space:nowrap; pointer-events:none}
+.w.miss{text-decoration:line-through 2.5px var(--bad); color:var(--bad); animation:shake .35s}
+@keyframes shake{25%{transform:translateX(-3px)}75%{transform:translateX(3px)}}
+.w.pc1{background:var(--p1); box-shadow:inset 0 -3px var(--p1b)}
+.w.pc2{background:var(--p2); box-shadow:inset 0 -3px var(--p2b)}
+.w.pc3{background:var(--p3); box-shadow:inset 0 -3px var(--p3b)}
+.w.miss.pc1,.w.miss.pc2,.w.miss.pc3{color:var(--ink)}
+.sentence.painting{touch-action:none; user-select:none; -webkit-user-select:none}
+.sentence.painting .w{cursor:crosshair}
+.sentence.painting .w:hover{outline:1.5px dashed var(--muted)}
+
+/* controls */
+.brushes{display:flex; flex-wrap:wrap; gap:8px}
+.brush{display:inline-flex; align-items:center; gap:8px; padding:6px 12px; border:1.5px solid var(--line); background:var(--card); border-radius:6px; cursor:pointer; font-size:.9rem}
+.brush i{width:18px; height:18px; border-radius:3px; display:block}
+.brush[aria-pressed="true"]{border-color:var(--ink); font-weight:700}
+.actions{display:flex; flex-wrap:wrap; gap:10px}
+.btn{padding:10px 18px; border-radius:6px; border:1.5px solid var(--line); background:var(--card); cursor:pointer; font-weight:700; font-size:.95rem}
+.btn:hover:not(:disabled){border-color:var(--ink)}
+.btn.primary{background:var(--ink); color:var(--card); border-color:var(--ink)}
+.btn.primary:hover:not(:disabled){opacity:.9}
+.btn:disabled{opacity:.4; cursor:not-allowed}
+.btn.choice{font:600 1.1rem var(--f-text); padding:12px 22px; min-width:10rem}
+.btn kbd{font:600 .7rem var(--f-ui); color:var(--muted); border:1px solid var(--line); border-radius:3px; padding:0 4px; margin-left:8px; vertical-align:middle}
+.btn.primary kbd{color:inherit; border-color:currentColor; opacity:.6}
+.feedback{min-height:1.6em; font-size:.95rem; display:flex; flex-wrap:wrap; align-items:baseline; gap:6px 8px}
+.feedback .mark{font:700 1.55rem/1 var(--f-hand)}
+.feedback .good{color:var(--good)} .feedback .bad{color:var(--bad)}
+.tchip{display:inline-block; padding:0 6px; border-radius:4px; border:1.5px solid var(--tc); color:var(--tc); font-family:var(--f-text); font-size:.95rem}
+
+/* graph */
+.sechead{display:flex; align-items:baseline; gap:12px; flex-wrap:wrap; margin-bottom:8px}
+h3{margin:0; font:600 1.1rem var(--f-text)}
+.sub{color:var(--muted); font-size:.85rem}
+.graphbox{overflow-x:auto; background:color-mix(in srgb,var(--card) 70%,transparent); border:1px solid var(--line); border-radius:10px; padding:10px; min-height:120px; display:flex}
+.graphbox svg{display:block; margin:auto; flex:none}
+.empty{margin:auto; color:var(--muted); font-size:.9rem; text-align:center; padding:20px}
+.node,.edge,.link{opacity:0; transition:opacity .4s ease}
+.node.on,.edge.on,.link.on{opacity:1}
+.node rect{fill:var(--card); stroke:var(--tc); stroke-width:1.6}
+.node .nt{fill:var(--ink); font:600 15px var(--f-ui); text-anchor:middle}
+.node .nl{fill:var(--tc); font:700 9.5px var(--f-ui); letter-spacing:.08em; text-anchor:middle; text-transform:uppercase}
+.t-o{--tc:var(--c-o)} .t-s{--tc:var(--c-s)} .t-d{--tc:var(--c-d)} .t-k{--tc:var(--c-k)} .t-a{--tc:var(--c-a)}
+.cl-1{--tc:var(--p1b)} .cl-2{--tc:var(--p2b)} .cl-3{--tc:var(--p3b)}
+.cl-1 rect{fill:var(--p1)} .cl-2 rect{fill:var(--p2)} .cl-3 rect{fill:var(--p3)}
+.edge{fill:none; stroke:var(--muted); stroke-width:1.5}
+.arrowhead{fill:var(--muted)}
+.link line{stroke:var(--ink); stroke-width:1.4}
+.link.dash line{stroke-dasharray:5 4; stroke:var(--muted)}
+.elab{fill:var(--muted); font:italic 13px var(--f-text); text-anchor:middle}
+
+/* lower */
+.lower{display:grid; grid-template-columns:1fr 1fr; gap:20px}
+.panel{background:color-mix(in srgb,var(--card) 70%,transparent); border:1px solid var(--line); border-radius:10px; padding:16px 18px; display:grid; gap:10px; align-content:start}
+.legend ul{list-style:none; margin:0; padding:0; display:grid; gap:10px}
+.legend li{display:grid; grid-template-columns:8.5rem 1fr; gap:10px; align-items:baseline; font-size:.88rem; color:var(--muted)}
+.legend li .w{font:1.05rem var(--f-text)}
+.stats{display:grid; gap:6px}
+.srow{display:grid; grid-template-columns:10.5rem 1fr 3.4rem; gap:10px; align-items:center; font-size:.85rem}
+.bar{height:6px; background:var(--line); border-radius:3px; overflow:hidden}
+.bar i{display:block; height:100%; background:var(--good)}
+.srow span:last-child{text-align:right; color:var(--muted); font-variant-numeric:tabular-nums}
+.modes{display:flex; flex-wrap:wrap; gap:6px 16px; font-size:.9rem; border:0; padding:0; margin:6px 0 0}
+.modes legend{font-weight:700; font-size:.72rem; letter-spacing:.09em; text-transform:uppercase; color:var(--muted); margin-bottom:4px; width:100%}
+.modes label{display:flex; gap:6px; align-items:center; cursor:pointer}
+.link-btn{justify-self:start; background:none; border:0; padding:0; color:var(--muted); text-decoration:underline; cursor:pointer; font-size:.85rem}
+@media (max-width:720px){ .lower{grid-template-columns:1fr} .steps{margin-left:0} .srow{grid-template-columns:8.5rem 1fr 3rem} }
+@media (prefers-reduced-motion: reduce){ *{animation:none!important; transition:none!important} }
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <h1>Pajęczynka <em>zdania</em></h1>
+      <p>Rozbiór logiczny: zaznaczaj części zdania i patrz, jak rośnie wykres.</p>
+    </div>
+    <div class="scorebox">
+      <div class="score"><span id="score">0</span><span class="pts">pkt</span><span id="delta" class="delta"></span></div>
+      <div class="meta">
+        <span>seria <b id="streak">0</b></span>
+        <span>rekord <b id="best">0</b></span>
+        <span>trafność <b id="acc">–</b></span>
+      </div>
+    </div>
+  </header>
+
+  <main class="card" id="card">
+    <div class="taskhead">
+      <span class="chip" id="kind">Części zdania</span>
+      <span class="return" id="retNote" hidden>powtórka</span>
+      <div class="steps" id="steps"></div>
+    </div>
+    <h2 id="prompt">…</h2>
+    <p class="hint" id="hint"></p>
+    <div class="sentence" id="sentence"></div>
+    <div class="brushes" id="brushes" hidden>
+      <button class="brush" data-b="1" aria-pressed="true"><i style="background:var(--p1);box-shadow:inset 0 -3px var(--p1b)"></i>Zdanie 1</button>
+      <button class="brush" data-b="2" aria-pressed="false"><i style="background:var(--p2);box-shadow:inset 0 -3px var(--p2b)"></i>Zdanie 2</button>
+      <button class="brush" data-b="3" aria-pressed="false"><i style="background:var(--p3);box-shadow:inset 0 -3px var(--p3b)"></i>Zdanie 3</button>
+      <button class="brush" data-b="0" aria-pressed="false"><i style="border:1.5px dashed var(--muted)"></i>Gumka</button>
+    </div>
+    <div class="actions" id="actions"></div>
+    <div class="feedback" id="feedback" aria-live="polite"></div>
+  </main>
+
+  <section>
+    <div class="sechead"><h3>Wykres zdania</h3><span class="sub" id="graphSub"></span></div>
+    <div class="graphbox" id="graphbox"></div>
+  </section>
+
+  <section class="lower">
+    <div class="panel legend">
+      <h3>Oznaczenia i pytania</h3>
+      <ul>
+        <li><span class="w" data-t="o">orzeczenie</span><span>co robi? co się z nim dzieje? w jakim jest stanie?</span></li>
+        <li><span class="w" data-t="s">podmiot</span><span>kto? co?</span></li>
+        <li><span class="w" data-t="d">dopełnienie</span><span>pytania przypadków zależnych: kogo? czego? komu? czym? o czym?</span></li>
+        <li><span class="w" data-t="k">okolicznik</span><span>gdzie? kiedy? jak? dlaczego? po co? w jakim stopniu?</span></li>
+        <li><span class="w" data-t="a">przydawka</span><span>jaki? który? czyj? ile? z czego?</span></li>
+      </ul>
+    </div>
+    <div class="panel">
+      <h3>Twoje wyniki</h3>
+      <div class="stats" id="stats"></div>
+      <fieldset class="modes">
+        <legend>Rodzaje zadań</legend>
+        <label><input type="checkbox" id="mode-parse" checked> części zdania</label>
+        <label><input type="checkbox" id="mode-rown" checked> równoważniki</label>
+        <label><input type="checkbox" id="mode-zloz" checked> zdania złożone</label>
+      </fieldset>
+      <button class="link-btn" id="reset">Wyzeruj wyniki</button>
+    </div>
+  </section>
+</div>
+<script>
+/* Format zdań do rozbioru:
+   słowo/TAG  — TAG: o orzeczenie, s podmiot, d dopełnienie, k okolicznik, a przydawka, x poza rozbiorem
+   słowa_połączone_podkreślnikiem = jedna część zdania
+   :id  — łączy nieciągłe fragmenty w jedną część (np. na/k:1 zielonym/a+ podwórku/k:1)
+   +, -, +2, -2 — wyraz nadrzędny wskazany przesunięciem; >id — nadrzędna część o danym id
+   domyślnie: podmiot, dopełnienie, okolicznik → orzeczenie; przydawka wymaga wskazania
+   * na początku — zdanie „pułapka” w pytaniu o równoważnik */
+const PARSE_DATA = `
+Mały/a+ chłopiec/s kopie/o piłkę/d.
+Mama/s piecze/o pyszne/a+ ciasto/d.
+Wczoraj/k padał/o rzęsisty/a+ deszcz/s.
+Stary/a+ pies/s śpi/o pod_stołem/k.
+Kasia/s czyta/o ciekawą/a+ książkę/d.
+Nasz/a+ nauczyciel/s mówi/o bardzo/k+ wyraźnie/k.
+Rano/k ptaki/s głośno/k śpiewają/o.
+Tata/s naprawił/o zepsuty/a+ rower/d.
+Dzieci/s bawią_się/o w_parku/k.
+Zielona/a+ żaba/s skoczyła/o do_stawu/k.
+Kot/s sąsiadów/a- łapie/o myszy/d.
+Ola/s pisze/o długi/a+ list/d.
+W_ogrodzie/k rosną/o piękne/a+ róże/s.
+Mój/a+ brat/s gra/o w_piłkę/d.
+Słońce/s świeci/o jasno/k.
+Uczniowie/s rozwiązują/o trudne/a+ zadanie/d.
+Po_lekcjach/k pojechaliśmy/o na_basen/k.
+Wiatr/s strącił/o dojrzałe/a+ jabłka/d z_drzewa/k.
+Janek/s kupił/o mamie/d kwiaty/d.
+Młody/a+ lekarz/s zbadał/o chorego/a+ pacjenta/d.
+Samolot/s wylądował/o na_lotnisku/k.
+Wieczorem/k długo/k rozmawialiśmy/o z_dziadkiem/d.
+Lis/s ukrył_się/o w_norze/k.
+Czerwony/a+ tramwaj/s jedzie/o powoli/k.
+Moja/a+ siostra/s jest_studentką/o.
+Ten/a+ dom/s jest/o:1 bardzo/k+ stary/o:1.
+Pies/s radośnie/k merda/o ogonem/d.
+Zimą/k dzieci/s lepią/o bałwana/d.
+Na_niebie/k pojawiła_się/o tęcza/s.
+Marek/s nie_odrobił/o pracy/d domowej/a-.
+Kierowca/s zatrzymał/o autobus/d przed_przejściem/k.
+Wszyscy/a+ uczniowie/s napisali/o sprawdzian/d.
+Ze_strachu/k zając/s uciekł/o do_lasu/k.
+Babcia/s opowiada/o wnukom/d ciekawe/a+ bajki/d.
+Kolorowe/a+ liście/s spadają/o z_drzew/k.
+Mój/a+ przyjaciel/s mieszka/o w_Krakowie/k.
+Pociąg/s przyjechał/o punktualnie/k.
+Ania/s podlewa/o kwiaty/d codziennie/k.
+Nad_rzeką/k wędkarze/s łowią/o ryby/d.
+Szary/a+ wróbel/s usiadł/o na_parapecie/k.
+Kucharz/s przygotował/o smaczny/a+ obiad/d.
+Burza/s zniszczyła/o stodołę/d sąsiada/a-.
+Jutro/k pojedziemy/o nad_morze/k.
+Dziewczynka/s w/a:1- czerwonej/a+ sukience/a:1 tańczy/o.
+Chłopiec/s z_plecakiem/a- czeka/o na_autobus/d.
+Pszczoły/s zbierają/o nektar/d z_kwiatów/k.
+Nasza/a+ drużyna/s wygrała/o ważny/a+ mecz/d.
+Dyrektor/s szkoły/a- przemawiał/o na_apelu/k.
+Mała/a+ Zosia/s boi_się/o ciemności/d.
+Wiewiórka/s zbiera/o orzechy/d na_zimę/k.
+Wujek/s podarował/o mi/d nowy/a+ zegarek/d.
+W_klasie/k panowała/o cisza/s.
+Koń/s biegnie/o galopem/k.
+Adam/s szybko/k rozwiązał/o zagadkę/d.
+Moi/a+ rodzice/s pracują/o w_szpitalu/k.
+Tomek/s pomaga/o młodszemu/a+ bratu/d.
+Krople/s deszczu/a- spływają/o po_szybie/k.
+Ogromny/a+ statek/s wypłynął/o z_portu/k.
+Na_łące/k pasą_się/o krowy/s.
+Paweł/s zgubił/o klucze/d od_mieszkania/a-.
+Dzieci/s z_radością/k powitały/o wakacje/d.
+Sowa/s poluje/o nocą/k.
+Mama/s kupiła/o świeży/a+ chleb/d w_piekarni/k.
+Sąsiad/s kosi/o trawę/d przed_domem/k.
+Wczoraj/k odwiedziła/o nas/d ciocia/s.
+Pilot/s bezpiecznie/k posadził/o samolot/d.
+Mój/a+2 młodszy/a+ brat/s chodzi/o do_przedszkola/k.
+Latem/k często/k kąpiemy_się/o w_jeziorze/k.
+Stolarz/s zrobił/o drewniany/a+ stół/d.
+Kot/s chętnie/k pije/o ciepłe/a+ mleko/d.
+Jesienią/k ptaki/s odlatują/o do/k:1 ciepłych/a+ krajów/k:1.
+Dziadek/s czyta/o gazetę/d przy_kominku/k.
+Nowy/a+ uczeń/s przedstawił_się/o klasie/d.
+Policjant/s zatrzymał/o złodzieja/d.
+Zmęczeni/a+ turyści/s odpoczywali/o w_schronisku/k.
+Ola/s ma/o piękny/a+ głos/d.
+Nasz/a+ sąsiad/s hoduje/o gołębie/d.
+Śnieg/s pokrył/o całe/a+ miasto/d.
+Z_komina/k unosił_się/o gęsty/a+ dym/s.
+Janek/s z_trudem/k podniósł/o ciężką/a+ walizkę/d.
+Weronika/s rysuje/o kolorowymi/a+ kredkami/d.
+Mama/s kroi/o chleb/d nożem/d.
+Nauczycielka/s sprawdza/o nasze/a+ zeszyty/d.
+W_zoo/k widzieliśmy/o słonia/d.
+Mały/a+ kotek/s bawi_się/o kłębkiem/d wełny/a-.
+Straż/s pożarna/a- gasi/o pożar/d.
+Rolnik/s orze/o pole/d traktorem/d.
+Nad_miastem/k krążą/o czarne/a+ chmury/s.
+Grzesiek/s ma/o dwa/a+ chomiki/d.
+Trzy/a+2 małe/a+ kotki/s spały/o w_koszyku/k.
+Ta/a+ książka/s jest/o:1 bardzo/k+ ciekawa/o:1.
+Piłkarz/s strzelił/o piękną/a+ bramkę/d.
+Zając/s szybko/k biegł/o przez_pole/k.
+Wieczorem/k na_niebie/k świecą/o gwiazdy/s.
+Nasz/a+ pies/s pilnuje/o domu/d.
+Turysta/s zgubił_się/o w_górach/k.
+Wiosną/k kwitną/o drzewa/s owocowe/a-.
+Konrad/s pożyczył/o mi/d swój/a+ słownik/d.
+Mrówki/s budują/o ogromne/a+ mrowisko/d.
+Dziewczęta/s śpiewały/o wesołą/a+ piosenkę/d.
+Ze_zmęczenia/k zasnąłem/o na_kanapie/k.
+Fryzjer/s obciął/o mi/d włosy/d.
+Wczoraj/k była/o piękna/a+ pogoda/s.
+Kasia/s zawsze/k pamięta/o o_urodzinach/d babci/a-.
+Leśniczy/s sadzi/o młode/a+ drzewka/d.
+Po_obiedzie/k dziadek/s drzemie/o w_fotelu/k.
+Małpy/s zręcznie/k skaczą/o po_gałęziach/k.
+Głośny/a+ dzwonek/s obudził/o mnie/d.
+Robert/s marzy/o o_podróży/d dookoła_świata/a-.
+Moja/a+ koleżanka/s świetnie/k pływa/o.
+Ogrodnik/s starannie/k przycina/o krzewy/d.
+Na_stole/k leży/o otwarty/a+ zeszyt/s.
+Julia/s dostała/o od_babci/d piękny/a+ szalik/d.
+Zegar/s wybił/o północ/d.
+Chmury/s zasłoniły/o słońce/d.
+Rycerz/s pokonał/o groźnego/a+ smoka/d.
+Mieszkańcy/s wsi/a- zbudowali/o nowy/a+ most/d.
+Każdego/a+ dnia/k chodzę/o do_szkoły/k.
+Mateusz/s nigdy/k nie_kłamie/o.
+Dobra/a+ wróżka/s spełniła/o trzy/a+ życzenia/d.
+Kowal/s kuje/o żelazo/d.
+Kasztany/s spadają/o jesienią/k na_chodnik/k.
+Niedźwiedź/s śpi/o w_gawrze/k przez/k:z całą/a+ zimę/k:z.
+Tata/s uczy/o mnie/d jazdy/d na_rowerze/a-.
+Weterynarz/s wyleczył/o chorego/a+ psa/d.
+Gęsta/a+ mgła/s spowiła/o dolinę/d.
+Autobus/s spóźnił_się/o dziesięć_minut/k.
+Moja/a+ mama/s lubi/o czarną/a+ kawę/d.
+Studenci/s zdają/o egzaminy/d w_czerwcu/k.
+Krasnoludki/s pracowały/o w_kopalni/k.
+Piekarz/s wstaje/o bardzo/k+ wcześnie/k.
+W_akwarium/k pływają/o złote/a+ rybki/s.
+Filip/s pomalował/o płot/d na_zielono/k.
+Mali/a+ harcerze/s rozpalili/o ognisko/d.
+Wiewiórki/s mieszkają/o w_dziuplach/k.
+Królewna/s zjadła/o zatrute/a+ jabłko/d.
+Kolega/s z_ławki/a- pożyczył/o mi/d gumkę/d.
+Ciocia/s upiekła/o sernik/d na_święta/k.
+Bocian/s stoi/o na/k:n jednej/a+ nodze/k:n.
+Nasza/a+ klasa/s pojechała/o na_wycieczkę/k.
+Magda/s śmieje_się/o głośno/k.
+Motyl/s usiadł/o na/k:k kolorowym/a+ kwiatku/k:k.
+Sprzedawca/s wydał/o mi/d resztę/d.
+Dziś/k mamy/o sprawdzian/d z_matematyki/a-.
+Wojtek/s zbiera/o znaczki/d pocztowe/a-.
+Bałtyk/s jest/o:1 zimnym/a+ morzem/o:1.
+Warszawa/s jest_stolicą/o Polski/a-.
+Mój/a+ dziadek/s był_marynarzem/o.
+Ta/a+ zupa/s jest/o:1 za/k+ słona/o:1.
+Mężczyzna/s w_okularach/a- czyta/o gazetę/d.
+Jutro/k dzieci/s będą_się_bawić/o na_plaży/k.
+Kwoka/s wodzi/o małe/a+ kurczęta/d.
+Karolina/s pięknie/k gra/o na_skrzypcach/d.
+Sanki/s zjeżdżają/o z_górki/k.
+Stary/a+ zegar/s tyka/o w_kuchni/k.
+Listonosz/s przyniósł/o nam/d paczkę/d.
+Maciek/s opowiedział/o zabawną/a+ historię/d.
+Wiatr/s szumi/o w_koronach/k drzew/a-.
+W_szafie/k wisi/o zimowa/a+ kurtka/s.
+Lekarz/s przepisał/o mi/d syrop/d na_kaszel/a-.
+Babcia/s zrobiła/o konfitury/d z_truskawek/a-.
+Tygrys/s cicho/k skradał_się/o przez_dżunglę/k.
+Nasi/a+ goście/s przyjechali/o późnym/a+ wieczorem/k.
+Mechanik/s naprawił/o silnik/d samochodu/a-.
+Pies/s zakopał/o kość/d w_ogródku/k.
+Ewa/s wraca/o ze_szkoły/k pieszo/k.
+Pod_mostem/k płynie/o wartka/a+ rzeka/s.
+Kotka/s urodziła/o małe/a+ kocięta/d.
+Szpak/s naśladuje/o głosy/d innych/a+ ptaków/a-2.
+Robotnicy/s remontują/o starą/a+ kamienicę/d.
+Wczoraj/k obejrzałem/o ciekawy/a+ film/d.
+Ogień/s ogrzewa/o zziębnięte/a+ dłonie/d.
+Hania/s często/k odwiedza/o chorą/a+ koleżankę/d.
+Gołębie/s gruchają/o na_dachu/k.
+Uczeń/s odpowiadał/o bez_zająknięcia/k.
+Dzik/s ryje/o w_ziemi/k.
+Klaudia/s przeczytała/o już/k wszystkie/a+ lektury/d.
+W_nocy/k mocno/k padało/o.
+Wieczorem/k zagrzmiało/o.
+Idę/o do_biblioteki/k po_książkę/k.
+Czytam/o ciekawą/a+ powieść/d.
+Pojechaliśmy/o w_góry/k.
+Kupiłam/o mleko/d w_sklepie/k.
+Zjedliśmy/o pyszne/a+ lody/d.
+Codziennie/k wstaję/o o_siódmej/k.
+Napiszę/o do_ciebie/d jutro/k.
+Byliśmy/o w_kinie/k.
+Dziękuję/o za_pomoc/d.
+Powoli/k świtało/o.
+Zapomniałem/o parasola/d.
+Uczymy_się/o języka/d angielskiego/a-.
+Nie_lubię/o szpinaku/d.
+W_lesie/k zbieramy/o grzyby/d.
+Posprzątaj/o swój/a+ pokój/d!
+Zamknij/o drzwi/d!
+Czy/x widziałeś/o mojego/a+ psa/d?
+Gdzie/k mieszka/o twoja/a+ babcia/s?
+Kto/s zjadł/o ostatnie/a+ ciastko/d?
+Dlaczego/k płaczesz/o?
+Co/d robisz/o w_sobotę/k?
+Kiedy/k wrócisz/o z_wakacji/k?
+Ala/s i/x Ola/s grają/o w_tenisa/d.
+Tata/s kupił/o jabłka/d i/x gruszki/d.
+Na_łące/k rosną/o maki/s i/x chabry/s.
+Mama/s i/x tata/s pracują/o w_banku/k.
+Kupiłem/o chleb/d, masło/d i/x ser/d.
+Bardzo/k+ wysoki/a+ mężczyzna/s wszedł/o do_sklepu/k.
+Niezwykle/k+ ciekawa/a+ wystawa/s odbyła_się/o w_muzeum/k.
+Nauczyciel/s pochwalił/o pilnego/a+ ucznia/d.
+Słowik/s śpiewa/o nocą/k w_zaroślach/k.
+Wielki/a+ słoń/s pije/o wodę/d trąbą/d.
+Kasia/s nosi/o okulary/d.
+Zuzia/s narysowała/o laurkę/d dla_mamy/d.
+Wszystkie/a+ sklepy/s są_zamknięte/o.
+Nasz/a+ samochód/s jest_czerwony/o.
+Na_podwórku/k bawią_się/o dzieci/s sąsiadów/a-.
+Wiosną/k bociany/s wracają/o do/k:g swoich/a+ gniazd/k:g.
+Jacek/s wysłał/o babci/d kartkę/d z_wakacji/a-.
+Rano/k spadł/o pierwszy/a+ śnieg/s.
+Kaczki/s pływają/o po_stawie/k.
+Artysta/s namalował/o piękny/a+ portret/d królowej/a-.
+Czarny/a+ kruk/s siedzi/o na/k:g wysokiej/a+ gałęzi/k:g.
+Maja/s dokładnie/k umyła/o ręce/d.
+Tata/s zawsze/k czyta/o mi/d bajki/d przed_snem/k.
+W_kuchni/k pachnie/o świeże/a+ ciasto/s.
+Nasz/a+ kot/s nie_lubi/o kąpieli/d.
+Po_deszczu/k na_drodze/k zostały/o kałuże/s.
+Janek/s wybił/o piłką/d szybę/d.
+Dwa/a+ bociany/s krążą/o nad_łąką/k.
+Moja/a+ ciocia/s mieszka/o za_granicą/k.
+Zmarznięty/a+ wróbel/s szuka/o okruszków/d.
+Dzielny/a+ strażak/s uratował/o małego/a+ kotka/d.
+Maks/s codziennie/k wyprowadza/o psa/d na_spacer/k.
+Owoce/s dojrzewają/o w_słońcu/k.
+W_bibliotece/k obowiązuje/o cisza/s.
+Latarnie/s oświetlają/o ciemną/a+ ulicę/d.
+Prezydent/s odwiedził/o naszą/a+ szkołę/d.
+Kucharka/s posoliła/o zupę/d.
+Dzięcioł/s leczy/o chore/a+ drzewa/d.
+Cała/a+ rodzina/s zasiadła/o do_kolacji/k.
+Mała/a+ Ania/s zasnęła/o szybko/k.
+Kasia/s z_uwagą/k słuchała/o wykładu/d.
+Ptaki/s zbudowały/o gniazdo/d na_balkonie/k.
+Ogrodnik/s posadził/o w_ogrodzie/k żółte/a+ tulipany/d.
+Stary/a+ rybak/s naprawia/o sieci/d.
+Z_powodu/k:p choroby/k:p Ola/s została/o w_domu/k.
+*Pada/o!
+*Grzmi/o.
+*Chodź/o tu/k!
+*Uważaj/o!
+*Sklep/s jest_zamknięty/o.
+*Mama/s jest/o w_pracy/k.
+*Na_dworze/k jest/o mróz/s.
+*W_klasie/k panuje/o cisza/s.
+*Nie_deptajcie/o trawników/d!
+*Wstęp/s jest_wzbroniony/o.
+*Za_oknem/k jest_ciemno/o.
+*Dzisiaj/k jest_zimno/o.
+*Wszędzie/k leży/o śnieg/s.
+*Lekcja/s się_skończyła/o.
+*Palenie/s jest_zabronione/o.
+`;
+
+/* Równoważniki zdań — brak osobowej formy czasownika */
+const ROWN_DATA = `
+Cisza!
+Uwaga, zły pies!
+Nie deptać trawników.
+Wstęp wzbroniony.
+Zakaz palenia.
+Palenie wzbronione.
+Mama w pracy.
+Na dworze mróz.
+Po burzy.
+Dzień dobry!
+Smacznego!
+Na pomoc!
+Pożar!
+Do widzenia.
+Wszystkiego najlepszego!
+Sklep zamknięty.
+Nad morzem piękna pogoda.
+Za oknem ciemno.
+W klasie cisza.
+Nie wychylać się.
+Zamknięto drogę z powodu remontu.
+Ogłoszono wyniki konkursu.
+Zbudowano nowy most.
+Znaleziono zgubione klucze.
+Wstać!
+Ręce do góry!
+Dobranoc.
+Brawo!
+Świetny pomysł!
+Jaka piękna pogoda!
+Co za widok!
+Pięknie tu.
+Zimno dzisiaj.
+Wszędzie pełno śniegu.
+Koniec lekcji.
+Bilety do kontroli.
+Szkoda czasu.
+Uwaga, remont!
+Nie hałasować po dwudziestej drugiej.
+Przejście przez tory wzbronione.
+Wyjście awaryjne.
+Łąka w kwiatach.
+Na stole kwiaty.
+W lesie mnóstwo grzybów.
+Wakacje nad jeziorem.
+Kupić chleb i mleko.
+Zapiąć pasy!
+Otwarto nowy basen.
+Szczęśliwej podróży!
+Gratulacje!
+Lekcja odwołana.
+Wszyscy na boisko!
+Nareszcie wakacje!
+Cicho tu i spokojnie.
+Posprzątano całą klasę.
+Nie biegać po korytarzu!
+Herbata z cytryną dla mnie.
+W szkole dzień otwarty.
+Jutro sprawdzian z historii.
+Precz z nudą!
+`;
+
+/* Zdania złożone: typ|zdanie; [N … ] = zdanie składowe N, słowa poza nawiasami (spójniki) nie są oceniane.
+   W — współrzędnie, P — podrzędnie (1 = nadrzędne), M — wielokrotnie złożone (bez pytania o rodzaj) */
+const ZLOZ_DATA = `
+W|[1 Zadzwonił telefon], więc [2 odebrałam go].
+W|[1 Pada deszcz], a [2 my siedzimy w domu].
+W|[1 Ala czyta książkę], a [2 Ola rysuje].
+W|[1 Wstałem wcześnie] i [2 poszedłem pobiegać].
+W|[1 Chciałem przyjść], ale [2 zachorowałem].
+W|[1 Słońce zaszło], [2 zrobiło się chłodno].
+W|Albo [1 pójdziemy do kina], albo [2 zostaniemy w domu].
+W|[1 Tata gotuje obiad], a [2 mama nakrywa do stołu].
+W|[1 Było późno], więc [2 dzieci poszły spać].
+W|[1 Uczyłem się długo], dlatego [2 dostałem piątkę].
+W|[1 Zima się skończyła] i [2 nadeszła wiosna].
+W|[1 Janek lubi piłkę nożną], lecz [2 jego brat woli koszykówkę].
+W|[1 Zgasło światło], [2 w pokoju zrobiło się ciemno].
+W|Nie tylko [1 ładnie śpiewa], ale też [2 gra na gitarze].
+W|[1 Zadzwoniłem do Kasi], lecz [2 nie odebrała].
+W|[1 Wiatr wiał mocno], [2 drzewa się kołysały].
+W|[1 Mama jest w pracy], a [2 tata jest w domu].
+W|[1 Pies zaczął ujadać], więc [2 złodziej uciekł].
+W|[1 Spieszyłem się], a jednak [2 spóźniłem się na autobus].
+W|[1 Skończyły się lekcje] i [2 uczniowie wybiegli ze szkoły].
+W|[1 Zabrzmiał dzwonek], więc [2 wróciliśmy do klasy].
+W|[1 Obiad był gotowy], zatem [2 usiedliśmy do stołu].
+W|[1 Ola się uczy], a [2 jej brat gra na komputerze].
+W|[1 Byłem zmęczony], toteż [2 szybko zasnąłem].
+W|[1 Kot miauczał] i [2 drapał drzwi].
+W|[1 Dzieci śpiewały] i [2 tańczyły].
+W|[1 Chłopcy biegali po boisku] i [2 głośno krzyczeli].
+W|[1 Kupiłem bilet], [2 wsiadłem do pociągu], [3 pojechałem nad morze].
+W|[1 Deszcz przestał padać], [2 wyszło słońce], [3 na niebie pojawiła się tęcza].
+W|[1 Było ciepło], ale [2 wiał silny wiatr].
+W|[1 Marek zgubił klucze], więc [2 nie mógł wejść do domu].
+W|[1 Babcia robi na drutach], a [2 dziadek czyta gazetę].
+W|[1 Nie lubię zimy], natomiast [2 uwielbiam lato].
+W|[1 Wszedł do klasy], [2 usiadł w ławce] i [3 otworzył zeszyt].
+P|[1 Wiem], że [2 masz rację].
+P|Kiedy [2 wróciłem do domu], [1 mama spała].
+P|[1 Nie poszedłem do szkoły], bo [2 byłem chory].
+P|[1 Chłopiec], [2 który siedzi obok mnie], [1 ma na imię Tomek].
+P|Jeśli [2 będzie ładna pogoda], [1 pojedziemy nad jezioro].
+P|[1 Zapytałam], [2 gdzie jest dworzec].
+P|[1 Czytam książkę], [2 którą dostałem od babci].
+P|Gdy [2 zaczęło padać], [1 schowaliśmy się pod drzewem].
+P|[1 Mama powiedziała], że [2 obiad jest gotowy].
+P|[1 Dom], [2 w którym mieszkam], [1 jest bardzo stary].
+P|[1 Uczę się pilnie], aby [2 rodzice byli ze mnie dumni].
+P|Chociaż [2 było zimno], [1 poszliśmy na spacer].
+P|[1 Nie wiem], [2 kto zjadł ciastko].
+P|[1 Tam], [2 gdzie mieszka babcia], [1 jest piękny las].
+P|[1 Zrobiłem to], [2 co mi kazałeś].
+P|[1 Kasia śmiała się tak głośno], że [2 wszyscy się obejrzeli].
+P|[1 Pies zaczął warczeć], kiedy [2 listonosz podszedł do furtki].
+P|[1 Tata obiecał], że [2 kupi mi rower].
+P|Ponieważ [2 padał deszcz], [1 mecz został odwołany].
+P|[1 Ten film], [2 który obejrzeliśmy wczoraj], [1 był nudny].
+P|[1 Nie przyjdę], jeżeli [2 nie zadzwonisz].
+P|[1 Pamiętam dzień], [2 w którym się poznaliśmy].
+P|[1 Zastanawiam się], czy [2 zdążę na pociąg].
+P|Zanim [2 wyjdziesz], [1 zamknij okno].
+P|[1 Dziewczynka płakała], ponieważ [2 zgubiła lalkę].
+P|[1 Opowiem ci], [2 jak było na wycieczce].
+P|[2 Kto pyta], [1 nie błądzi].
+P|[1 Mieszkam w mieście], [2 które leży nad Wisłą].
+P|Odkąd [2 zamieszkaliśmy na wsi], [1 dzieci są zdrowsze].
+P|[1 Wróciliśmy do domu], zanim [2 zaczęła się burza].
+P|[1 Nauczyciel wyjaśnił], [2 dlaczego niebo jest niebieskie].
+P|[1 Kolega], [2 którego spotkałem w parku], [1 zaprosił mnie na urodziny].
+P|[1 Było tak ciemno], że [2 nic nie widziałem].
+P|[1 Cieszę się], że [2 przyjechałeś].
+P|Skoro [2 skończyłeś lekcje], [1 możesz iść na podwórko].
+P|[1 Ubierz się ciepło], bo [2 na dworze jest mróz].
+P|[1 Chcę], żebyś [2 mi pomógł].
+P|Gdyby [2 nie padało], [1 poszlibyśmy na plażę].
+P|[1 Jem], [2 kiedy jestem głodny].
+P|[1 Książka], [2 którą czytam], [1 opowiada o piratach].
+P|[1 Nie rozumiem], dlaczego [2 się złościsz].
+M|Gdy [2 wróciłem ze szkoły], [1 zjadłem obiad] i [3 odrobiłem lekcje].
+M|[1 Wiem], że [2 jesteś zmęczony], ale [3 musimy jeszcze posprzątać].
+M|[1 Zosia powiedziała], że [2 przyjdzie], jeśli [3 skończy pracę].
+M|[1 Pies], [2 którego znaleźliśmy], [1 był głodny], więc [3 daliśmy mu jeść].
+`;
+
+/* ---------- parsowanie danych ---------- */
+const TAGS = {
+  o:{name:'orzeczenie', lab:'orzecz.', short:'orzecz.', prompt:'Zaznacz orzeczenie', none:null,
+     q:'Co robi? Co się z nim dzieje? W jakim jest stanie? Razem z nim zaznacz „nie”, „się” i łącznik („jest”, „był”…).'},
+  s:{name:'podmiot', lab:'podmiot', short:'podmiot', prompt:'Zaznacz podmiot', none:'Brak podmiotu',
+     q:'Kto? Co? Wykonawca czynności, zwykle w mianowniku. Jeśli go nie ma, to podmiot domyślny albo zdanie bezpodmiotowe.'},
+  d:{name:'dopełnienie', lab:'dopełn.', short:'dopełn.', prompt:'Zaznacz wszystkie dopełnienia', none:'Brak dopełnień',
+     q:'Kogo? Czego? Komu? Czemu? Kogo? Co? Kim? Czym? O kim? O czym? Uzupełnia czasownik.'},
+  k:{name:'okolicznik', lab:'okol.', short:'okol.', prompt:'Zaznacz wszystkie okoliczniki', none:'Brak okoliczników',
+     q:'Gdzie? Kiedy? Jak? Dlaczego? Po co? W jakim stopniu? Opisuje okoliczności czynności lub cechy.'},
+  a:{name:'przydawka', lab:'przyd.', short:'przyd.', prompt:'Zaznacz wszystkie przydawki', none:'Brak przydawek',
+     q:'Jaki? Który? Czyj? Ile? Z czego? Określa rzeczownik.'},
+};
+const STEPS = ['o','s','d','k','a'];
+const PUNCT = /([.,!?;:…]*)$/;
+
+function parseSimple(line, idx){
+  let trap = false;
+  if(line.startsWith('*')){ trap = true; line = line.slice(1); }
+  const R = /^(.+?)\/([sodkax])(?::([A-Za-z0-9]+))?(?:([+-]\d*)|>([A-Za-z0-9]+))?([.,!?;:…]*)$/;
+  const toks = [], units = [], byG = {};
+  line.trim().split(/\s+/).forEach((raw, i) => {
+    const m = raw.match(R);
+    if(!m) throw new Error(`zdanie ${idx}: nie rozumiem „${raw}”`);
+    const tok = {i, text:m[1].replace(/_/g,' '), punct:m[6]||'', tag:m[2]};
+    let u;
+    if(m[3] && byG[m[3]]){
+      u = byG[m[3]];
+      if(u.tag !== tok.tag) throw new Error(`zdanie ${idx}: grupa ${m[3]} ma różne typy`);
+    } else {
+      u = {id:units.length, tag:tok.tag, toks:[], spec:null};
+      units.push(u);
+      if(m[3]) byG[m[3]] = u;
+    }
+    u.toks.push(i);
+    tok.unit = u.id;
+    if(m[4]) u.spec = {off: m[4].length === 1 ? (m[4] === '+' ? 1 : -1) : parseInt(m[4], 10), from:i};
+    if(m[5]) u.spec = {gid:m[5]};
+    toks.push(tok);
+  });
+  const os = units.filter(u => u.tag === 'o');
+  if(os.length !== 1) throw new Error(`zdanie ${idx}: oczekiwano jednego orzeczenia`);
+  units.forEach(u => {
+    u.text = u.toks.map(i => toks[i].text).join(' ');
+    let h = null;
+    if(u.spec){
+      if(u.spec.gid) h = byG[u.spec.gid];
+      else { const t = toks[u.spec.from + u.spec.off]; h = t ? units[t.unit] : null; }
+      if(!h) throw new Error(`zdanie ${idx}: zły nadrzędnik dla „${u.text}”`);
+    } else if('sdk'.includes(u.tag)) h = os[0];
+    else if(u.tag === 'a') throw new Error(`zdanie ${idx}: przydawka „${u.text}” bez nadrzędnika`);
+    if(h && (h === u || h.tag === 'x')) throw new Error(`zdanie ${idx}: błędny nadrzędnik „${u.text}”`);
+    u.head = h ? h.id : null;
+  });
+  units.forEach(u => {
+    if(u.tag === 'x' || u.tag === 's' || u.tag === 'o') return;
+    let c = u, n = 0;
+    while(c && c.tag !== 's' && c.tag !== 'o'){ c = units[c.head]; if(++n > 20) break; }
+    if(!c || n > 20) throw new Error(`zdanie ${idx}: „${u.text}” nie łączy się z orzeczeniem`);
+  });
+  return {kind:'parse', toks, units, trap, oUnit:os[0]};
+}
+
+function splitPlain(line){
+  return line.trim().split(/\s+/).map(w => {
+    const m = w.match(/^(.*?)([.,!?;:…]*)$/);
+    return {text:m[1], punct:m[2]};
+  });
+}
+
+function parseZ(line, idx){
+  const type = line[0], body = line.slice(2);
+  if(!'WPM'.includes(type) || line[1] !== '|') throw new Error(`złożone ${idx}: brak typu`);
+  const re = /\[(\d)|\]|[^\s\[\]]+/g;
+  let m, cur = 0; const words = [];
+  while((m = re.exec(body))){
+    if(m[1]) cur = +m[1];
+    else if(m[0] === ']') cur = 0;
+    else {
+      const mm = m[0].match(/^(.*?)([.,!?;:…]*)$/);
+      if(!mm[1]){ if(words.length) words[words.length-1].punct += mm[2]; }
+      else words.push({text:mm[1], punct:mm[2], clause:cur});
+    }
+  }
+  const n = Math.max(...words.map(w => w.clause));
+  if(n < 2) throw new Error(`złożone ${idx}: mniej niż 2 zdania składowe`);
+  return {kind:'z', type, words, n};
+}
+
+const lines = s => s.split('\n').map(l => l.trim()).filter(Boolean);
+const PARSED = lines(PARSE_DATA).map(parseSimple);
+const ROWN = lines(ROWN_DATA).map(l => ({kind:'r', words:splitPlain(l)}));
+const ZLOZ = lines(ZLOZ_DATA).map(parseZ);
+const TRAPS = PARSED.map((p, i) => p.trap ? i : -1).filter(i => i >= 0);
+const TRICKY = PARSED.map((p, i) => p.toks.some(t => t.tag === 'x' || t.punct === ',') ? i : -1).filter(i => i >= 0);
+
+/* ---------- SVG ---------- */
+const NS = 'http://www.w3.org/2000/svg';
+function svgEl(tag, attrs, parent){
+  const e = document.createElementNS(NS, tag);
+  for(const k in attrs) e.setAttribute(k, attrs[k]);
+  if(parent) parent.appendChild(e);
+  return e;
+}
+let mctx;
+function textW(text, font){
+  mctx = mctx || document.createElement('canvas').getContext('2d');
+  mctx.font = font;
+  return mctx.measureText(text).width;
+}
+const FONT_NT = '600 15px "Atkinson Hyperlegible", system-ui, sans-serif';
+const FONT_NL = '700 9.5px "Atkinson Hyperlegible", system-ui, sans-serif';
+function addArrowDef(svg){
+  const defs = svgEl('defs', {}, svg);
+  const mk = svgEl('marker', {id:'arr', viewBox:'0 0 10 10', refX:'9', refY:'5', markerWidth:'7', markerHeight:'7', orient:'auto-start-reverse'}, defs);
+  svgEl('path', {d:'M0,0 L10,5 L0,10 z', class:'arrowhead'}, mk);
+}
+function drawNode(svg, cls, x, y, w, h, main, label, id){
+  const g = svgEl('g', {class:`node ${cls}`, transform:`translate(${x - w/2},${y})`, 'data-u':id}, svg);
+  svgEl('rect', {width:w, height:h, rx:7}, g);
+  svgEl('text', {x:w/2, y:21, class:'nt'}, g).textContent = main;
+  svgEl('text', {x:w/2, y:38, class:'nl'}, g).textContent = label;
+  return g;
+}
+
+function buildTree(item){
+  const box = document.getElementById('graphbox');
+  box.innerHTML = '';
+  const nodes = item.units.filter(u => u.tag !== 'x');
+  const top = [...nodes.filter(u => u.tag === 's'), ...nodes.filter(u => u.tag === 'o')];
+  const kids = new Map(nodes.map(u => [u.id, []]));
+  nodes.forEach(u => { if(u.tag !== 's' && u.tag !== 'o' && kids.has(u.head)) kids.get(u.head).push(u); });
+  const H = 48, VG = 58, HG = 14, TG = 54, PAD = 16;
+  const W = {}, SW = {}, pos = {};
+  nodes.forEach(u => W[u.id] = Math.ceil(Math.max(textW(u.text, FONT_NT), textW(TAGS[u.tag].name.toUpperCase(), FONT_NL) * 1.12)) + 28);
+  const cw = ch => ch.reduce((s, c) => s + SW[c.id], 0) + HG * Math.max(0, ch.length - 1);
+  const sw = u => { kids.get(u.id).forEach(sw); return SW[u.id] = Math.max(W[u.id], cw(kids.get(u.id))); };
+  let maxD = 0;
+  const place = (u, x0, d) => {
+    maxD = Math.max(maxD, d);
+    pos[u.id] = {x:x0 + SW[u.id]/2, y:PAD + d * (H + VG)};
+    const ch = kids.get(u.id);
+    let x = x0 + (SW[u.id] - cw(ch)) / 2;
+    ch.forEach(c => { place(c, x, d + 1); x += SW[c.id] + HG; });
+  };
+  let x = PAD;
+  top.forEach(u => { sw(u); place(u, x, 0); x += SW[u.id] + TG; });
+  const width = Math.ceil(x - TG + PAD), height = PAD * 2 + (maxD + 1) * H + maxD * VG;
+  const svg = svgEl('svg', {width, height, viewBox:`0 0 ${width} ${height}`, role:'img', 'aria-label':'Wykres zależności części zdania'}, box);
+  addArrowDef(svg);
+  nodes.forEach(u => {
+    if(u.tag === 's' || u.tag === 'o' || !pos[u.head]) return;
+    const p = pos[u.head], c = pos[u.id];
+    const y1 = p.y + H, y2 = c.y - 1, my = (y1 + y2) / 2;
+    svgEl('path', {d:`M${p.x},${y1} C${p.x},${my} ${c.x},${my} ${c.x},${y2}`, class:'edge', 'marker-end':'url(#arr)', 'data-a':u.head, 'data-b':u.id}, svg);
+  });
+  for(let i = 0; i < top.length - 1; i++){
+    const a = top[i], b = top[i+1], y = pos[a.id].y + H/2;
+    const x1 = pos[a.id].x + W[a.id]/2, x2 = pos[b.id].x - W[b.id]/2;
+    const g = svgEl('g', {class:'link' + (a.tag === b.tag ? ' dash' : ''), 'data-a':a.id, 'data-b':b.id}, svg);
+    if(a.tag === b.tag) svgEl('line', {x1, y1:y, x2, y2:y}, g);
+    else { svgEl('line', {x1, y1:y-3, x2, y2:y-3}, g); svgEl('line', {x1, y1:y+3, x2, y2:y+3}, g); }
+  }
+  nodes.forEach(u => drawNode(svg, 't-' + u.tag, pos[u.id].x, pos[u.id].y, W[u.id], H, u.text, TAGS[u.tag].name, u.id));
+  return svg;
+}
+function revealTree(shown){
+  const svg = document.querySelector('#graphbox svg');
+  if(!svg) return;
+  svg.querySelectorAll('.node').forEach(n => n.classList.toggle('on', shown.has(+n.dataset.u)));
+  svg.querySelectorAll('.edge,.link').forEach(e => e.classList.toggle('on', shown.has(+e.dataset.a) && shown.has(+e.dataset.b)));
+}
+
+function buildClauses(item){
+  const box = document.getElementById('graphbox');
+  box.innerHTML = '';
+  const H = 48, PAD = 16, HG = 64, VG = 70;
+  const cl = [];
+  for(let c = 1; c <= item.n; c++){
+    const idxs = item.words.map((w, i) => w.clause === c ? i : -1).filter(i => i >= 0);
+    let t = idxs.map(i => item.words[i].text).join(' ');
+    if(t.length > 34) t = t.slice(0, 32) + '…';
+    const conj = [];
+    for(let j = idxs[0] - 1; j >= 0 && item.words[j].clause === 0; j--) conj.unshift(item.words[j].text);
+    const w = Math.ceil(textW(t, FONT_NT)) + 30;
+    cl.push({c, t, conj:conj.join(' '), w});
+  }
+  const lab = c => item.type === 'P' ? (c === 1 ? 'zdanie nadrzędne' : 'zdanie podrzędne') : 'zdanie składowe ' + c;
+  let width, height;
+  const pos = {};
+  if(item.type === 'P'){
+    const subs = cl.filter(k => k.c !== 1);
+    const rowW = subs.reduce((s, k) => s + k.w, 0) + HG * (subs.length - 1);
+    width = Math.max(rowW, cl[0].w) + PAD * 2;
+    height = PAD * 2 + H * 2 + VG;
+    pos[1] = {x:width/2, y:PAD};
+    let x = (width - rowW) / 2;
+    subs.forEach(k => { pos[k.c] = {x:x + k.w/2, y:PAD + H + VG}; x += k.w + HG; });
+  } else {
+    width = cl.reduce((s, k) => s + k.w, 0) + HG * (cl.length - 1) + PAD * 2;
+    height = PAD * 2 + H + 20;
+    let x = PAD;
+    cl.forEach(k => { pos[k.c] = {x:x + k.w/2, y:PAD + 16}; x += k.w + HG; });
+  }
+  const svg = svgEl('svg', {width, height, viewBox:`0 0 ${width} ${height}`, role:'img', 'aria-label':'Wykres zdania złożonego'}, box);
+  addArrowDef(svg);
+  if(item.type === 'P'){
+    cl.filter(k => k.c !== 1).forEach(k => {
+      const p = pos[1], c = pos[k.c], y1 = p.y + H, y2 = c.y - 1, my = (y1 + y2) / 2;
+      svgEl('path', {d:`M${p.x},${y1} C${p.x},${my} ${c.x},${my} ${c.x},${y2}`, class:'edge on', 'marker-end':'url(#arr)'}, svg);
+      if(k.conj) svgEl('text', {x:(p.x + c.x)/2 + 8, y:my + 4, class:'elab'}, svg).textContent = k.conj;
+    });
+  } else {
+    for(let i = 0; i < cl.length - 1; i++){
+      const a = cl[i], b = cl[i+1], y = pos[a.c].y + H/2;
+      const x1 = pos[a.c].x + a.w/2, x2 = pos[b.c].x - b.w/2;
+      const g = svgEl('g', {class:'link on'}, svg);
+      svgEl('line', {x1, y1:y, x2, y2:y}, g);
+      svgEl('text', {x:(x1 + x2)/2, y:y - 8, class:'elab'}, svg).textContent = b.conj || '—';
+    }
+  }
+  cl.forEach(k => drawNode(svg, 'on cl-' + k.c, pos[k.c].x, pos[k.c].y, k.w, H, k.t, lab(k.c), k.c));
+}
+
+/* ---------- stan gry ---------- */
+const $ = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+const esc = s => s.replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const STORE = 'pajeczynka-zdania-v1';
+const CATS = [['o','Orzeczenie'],['s','Podmiot'],['d','Dopełnienie'],['k','Okolicznik'],['a','Przydawka'],
+  ['rown','Zdanie czy równoważnik'],['zloz','Pojedyncze czy złożone'],['podzial','Zdania składowe'],['typ','Rodzaj złożenia']];
+
+const S = {score:0, best:0, streak:0, stats:{}, modes:{parse:true, rown:true, zloz:true}};
+try { Object.assign(S, JSON.parse(localStorage.getItem(STORE)) || {}); } catch(e) {}
+CATS.forEach(([k]) => S.stats[k] = S.stats[k] || [0, 0]);
+S.streak = 0;
+function save(){ try { localStorage.setItem(STORE, JSON.stringify({score:S.score, best:S.best, stats:S.stats, modes:S.modes})); } catch(e) {} }
+
+let round = 0, T = null, lastKey = null, brush = 1, painting = false, paintVal = 1;
+const pending = [];
+const decks = {p:[], r:[], z:[]};
+function draw(name, size){
+  if(!decks[name].length){
+    decks[name] = [...Array(size).keys()];
+    for(let i = size - 1; i > 0; i--){ const j = Math.floor(Math.random() * (i + 1)); [decks[name][i], decks[name][j]] = [decks[name][j], decks[name][i]]; }
+  }
+  return decks[name].pop();
+}
+const rnd = a => a[Math.floor(Math.random() * a.length)];
+const modeOf = key => ({p:'parse', r:'rown', rn:'rown', z:'zloz', zn:'zloz'})[key.split(':')[0]];
+
+function pickKey(){
+  round++;
+  const di = pending.findIndex(p => p.due <= round && S.modes[modeOf(p.key)] && p.key !== lastKey);
+  if(di >= 0) return {key:pending.splice(di, 1)[0].key, repeat:true};
+  const w = [['parse', .64], ['rown', .18], ['zloz', .18]].filter(([m]) => S.modes[m]);
+  const total = w.reduce((s, [, v]) => s + v, 0);
+  let r = Math.random() * total, mode = w[0][0];
+  for(const [m, v] of w){ if((r -= v) <= 0){ mode = m; break; } }
+  let key;
+  for(let tries = 0; tries < 5; tries++){
+    if(mode === 'parse') key = 'p:' + draw('p', PARSED.length);
+    else if(mode === 'rown') key = Math.random() < .55 ? 'r:' + draw('r', ROWN.length)
+      : 'rn:' + (Math.random() < .5 ? rnd(TRAPS) : rnd(PARSED.map((_, i) => i)));
+    else key = Math.random() < .62 ? 'z:' + draw('z', ZLOZ.length)
+      : 'zn:' + (Math.random() < .6 ? rnd(TRICKY) : Math.floor(Math.random() * PARSED.length));
+    if(key !== lastKey) break;
+  }
+  return {key, repeat:false};
+}
+
+function makeTask({key, repeat}){
+  const [k, i] = key.split(':'), idx = +i;
+  const base = {key, repeat, results:[], sel:new Set(), labeled:new Set(), miss:new Set(), failed:false, scheduled:false, step:0};
+  if(k === 'p') return {...base, mode:'parse', item:PARSED[idx], phase:'select',
+    stepDefs:STEPS.map(t => ({label:TAGS[t].short}))};
+  if(k === 'r') return {...base, mode:'rown', item:ROWN[idx], isR:true, phase:'ask', stepDefs:[{label:'zdanie?'}]};
+  if(k === 'rn') return {...base, mode:'rown', item:PARSED[idx], isR:false, phase:'ask', stepDefs:[{label:'zdanie?'}]};
+  if(k === 'z'){
+    const it = ZLOZ[idx];
+    return {...base, mode:'zloz', item:it, isZ:true, phase:'ask', paint:[], truth:false, wrongW:new Set(),
+      stepDefs:[{label:'budowa'}, {label:'podział'}, ...(it.type !== 'M' ? [{label:'rodzaj'}] : [])]};
+  }
+  return {...base, mode:'zloz', item:PARSED[idx], isZ:false, phase:'ask', stepDefs:[{label:'budowa'}]};
+}
+
+function schedule(){
+  T.failed = true;
+  if(T.scheduled) return;
+  T.scheduled = true;
+  pending.push({key:T.key, due:round + 3 + Math.floor(Math.random() * 3)});
+}
+
+function award(ok, cat){
+  let d = ok ? 10 : -5, bonus = 0;
+  S.stats[cat][1]++;
+  if(ok){ S.stats[cat][0]++; S.streak++; if(S.streak % 5 === 0){ bonus = 5; d += 5; } }
+  else { S.streak = 0; schedule(); }
+  S.score += d;
+  S.best = Math.max(S.best, S.score);
+  T.results.push(ok);
+  const del = $('#delta');
+  del.className = 'delta';
+  void del.offsetWidth;
+  del.textContent = (d > 0 ? '+' : '−') + Math.abs(d);
+  del.className = 'delta ' + (ok ? 'up' : 'down');
+  save(); renderHeader(); renderStats();
+  return bonus;
+}
+
+/* ---------- rendering ---------- */
+function renderHeader(){
+  $('#score').textContent = S.score;
+  $('#streak').textContent = S.streak;
+  $('#best').textContent = S.best;
+  const [c, t] = Object.values(S.stats).reduce(([a, b], [x, y]) => [a + x, b + y], [0, 0]);
+  $('#acc').textContent = t ? Math.round(100 * c / t) + '%' : '–';
+}
+function renderStats(){
+  $('#stats').innerHTML = CATS.map(([k, name]) => {
+    const [c, t] = S.stats[k];
+    return `<div class="srow"><span>${name}</span><span class="bar"><i style="width:${t ? 100 * c / t : 0}%"></i></span><span>${c}/${t}</span></div>`;
+  }).join('');
+}
+function renderSteps(){
+  $('#steps').innerHTML = T.stepDefs.map((d, i) => {
+    const r = T.results[i];
+    const cls = r === true ? 'ok' : r === false ? 'bad' : (i === T.step && T.phase !== 'done' && T.phase !== 'review' ? 'cur' : '');
+    return `<span class="st ${cls}">${d.label}</span>`;
+  }).join('');
+}
+function setPrompt(title, hint){ $('#prompt').textContent = title; $('#hint').innerHTML = hint || ''; $('#hint').hidden = !hint; }
+function setActions(list){
+  const box = $('#actions');
+  box.innerHTML = '';
+  list.forEach(a => {
+    const b = document.createElement('button');
+    b.className = 'btn' + (a.primary ? ' primary' : '') + (a.choice ? ' choice' : '');
+    b.innerHTML = esc(a.label) + (a.key ? `<kbd>${a.key === 'Enter' ? '↵' : a.key}</kbd>` : '');
+    if(a.key) b.dataset.key = a.key;
+    if(a.id) b.id = a.id;
+    b.disabled = !!a.disabled;
+    b.onclick = a.onClick;
+    box.appendChild(b);
+  });
+}
+function feedback(html){ $('#feedback').innerHTML = html; }
+const good = t => `<span class="mark good">${t}</span>`;
+const bad = t => `<span class="mark bad">${t}</span>`;
+const chip = (tag, text) => `<span class="tchip" style="--tc:var(--c-${tag})">${esc(text)}</span>`;
+
+function sentenceWords(){ return T.item.kind === 'parse' ? T.item.toks : T.item.words; }
+function renderSentence(){
+  $('#sentence').innerHTML = sentenceWords().map((w, i) =>
+    `<span class="tk"><span class="w" data-i="${i}">${esc(w.text)}</span>${w.punct ? `<span class="p">${esc(w.punct)}</span>` : ''}</span>`
+  ).join(' ');
+}
+function updateSentence(){
+  const it = T.item;
+  $('#sentence').classList.toggle('painting', T.phase === 'paint');
+  $('#brushes').hidden = T.phase !== 'paint';
+  $$('#sentence .w').forEach(el => {
+    const i = +el.dataset.i;
+    if(it.kind === 'parse'){
+      const tok = it.toks[i], u = it.units[tok.unit];
+      el.classList.toggle('click', T.mode === 'parse' && T.phase === 'select' && u.tag !== 'x' && !T.labeled.has(u.id));
+      el.classList.toggle('sel', T.sel.has(u.id));
+      el.classList.toggle('miss', T.miss.has(u.id));
+      if(T.labeled.has(u.id) && u.tag !== 'x'){
+        el.dataset.t = u.tag;
+        if(u.toks[0] === i) el.dataset.lab = TAGS[u.tag].lab; else delete el.dataset.lab;
+      } else { delete el.dataset.t; delete el.dataset.lab; }
+    } else if(it.kind === 'z'){
+      const v = T.truth ? it.words[i].clause : (T.paint[i] || 0);
+      [1, 2, 3].forEach(c => el.classList.toggle('pc' + c, v === c));
+      el.classList.toggle('miss', T.truth && T.wrongW.has(i));
+    }
+  });
+}
+function graphEmpty(msg, sub){
+  $('#graphbox').innerHTML = `<p class="empty">${msg}</p>`;
+  $('#graphSub').textContent = sub || '';
+}
+
+function start(){
+  const pk = pickKey();
+  lastKey = pk.key;
+  T = makeTask(pk);
+  $('#kind').textContent = {parse:'Części zdania', rown:'Zdanie czy równoważnik?', zloz:'Budowa zdania'}[T.mode];
+  $('#retNote').hidden = !T.repeat;
+  feedback('');
+  renderSentence();
+  if(T.mode === 'parse'){
+    buildTree(T.item);
+    revealTree(T.labeled);
+    $('#graphSub').textContent = 'rośnie z każdą rozpoznaną częścią zdania';
+  } else if(T.mode === 'rown'){
+    graphEmpty('Odpowiedz, a zobaczysz wyjaśnienie.', '');
+  } else {
+    graphEmpty('Odpowiedz, a zobaczysz budowę zdania.', '');
+  }
+  render();
+}
+
+function render(){
+  renderSteps();
+  if(T.mode === 'parse') renderParse();
+  else if(T.mode === 'rown') renderRown();
+  else renderZloz();
+  updateSentence();
+}
+
+/* ---------- części zdania ---------- */
+function renderParse(){
+  const cur = STEPS[T.step];
+  if(T.phase === 'done'){
+    const okN = T.results.filter(Boolean).length;
+    setPrompt('Zdanie rozebrane',
+      `${okN} z ${STEPS.length} kroków bez błędu.` + (T.failed ? ' To zdanie wróci za kilka przykładów.' : ''));
+    setActions([{label:'Następne zdanie', primary:true, key:'Enter', onClick:start}]);
+    return;
+  }
+  setPrompt(TAGS[cur].prompt, TAGS[cur].q);
+  if(T.phase === 'review'){
+    setActions([{label:'Dalej', primary:true, key:'Enter', onClick:advanceParse}]);
+    return;
+  }
+  const acts = [{label:'Sprawdź', primary:true, key:'Enter', id:'checkBtn', disabled:!T.sel.size, onClick:() => checkParse(false)}];
+  if(TAGS[cur].none) acts.push({label:TAGS[cur].none, key:'0', onClick:() => checkParse(true)});
+  setActions(acts);
+}
+
+function checkParse(none){
+  const cur = STEPS[T.step], it = T.item;
+  if(none) T.sel.clear();
+  const correct = it.units.filter(u => u.tag === cur).map(u => u.id);
+  const ok = correct.length === T.sel.size && correct.every(id => T.sel.has(id));
+  const bonus = award(ok, cur);
+  correct.forEach(id => T.labeled.add(id));
+  const list = correct.map(id => chip(cur, it.units[id].text)).join(' ');
+  const plural = {s:'podmiotu', d:'dopełnień', k:'okoliczników', a:'przydawek', o:'orzeczenia'}[cur];
+  if(ok){
+    feedback(good(bonus ? `Dobrze! Seria ${S.streak}, +${bonus}` : 'Dobrze!') + (correct.length ? list : `<span>w tym zdaniu nie ma ${plural}.</span>`));
+    T.sel.clear();
+    revealTree(T.labeled);
+    advanceParse();
+  } else {
+    T.miss = new Set([...T.sel].filter(id => !correct.includes(id)));
+    T.sel.clear();
+    const extra = cur === 's' && !correct.length ? ' (podmiot domyślny lub zdanie bezpodmiotowe)' : '';
+    feedback(bad('Nie tym razem.') + (correct.length ? `<span>Poprawnie:</span> ${list}` : `<span>W tym zdaniu nie ma ${plural}${extra}.</span>`));
+    revealTree(T.labeled);
+    T.phase = 'review';
+    render();
+  }
+}
+
+function advanceParse(){
+  T.miss.clear();
+  T.step++;
+  T.phase = T.step >= STEPS.length ? 'done' : 'select';
+  if(T.phase === 'done') T.item.units.forEach(u => u.tag !== 'x' && T.labeled.add(u.id));
+  revealTree(T.labeled);
+  render();
+}
+
+/* ---------- równoważnik ---------- */
+function renderRown(){
+  if(T.phase === 'ask'){
+    setPrompt('Zdanie czy równoważnik zdania?', 'Zdanie ma orzeczenie (osobową formę czasownika). Równoważnik go nie ma.');
+    setActions([
+      {label:'Zdanie', choice:true, key:'1', onClick:() => answerRown(false)},
+      {label:'Równoważnik zdania', choice:true, key:'2', onClick:() => answerRown(true)},
+    ]);
+  } else {
+    setPrompt(T.isR ? 'To równoważnik zdania' : 'To zdanie', '');
+    setActions([{label:'Dalej', primary:true, key:'Enter', onClick:start}]);
+  }
+}
+function answerRown(saysR){
+  const ok = saysR === T.isR;
+  award(ok, 'rown');
+  T.phase = 'review';
+  if(T.isR){
+    feedback((ok ? good('Dobrze!') : bad('Nie tym razem.')) + '<span>Nie ma tu osobowej formy czasownika, więc nie ma orzeczenia.</span>');
+    graphEmpty('Równoważnik zdania nie ma orzeczenia, więc nie ma wokół czego budować wykresu.', '');
+  } else {
+    T.labeled = new Set(T.item.units.filter(u => u.tag !== 'x').map(u => u.id));
+    feedback((ok ? good('Dobrze!') : bad('Nie tym razem.')) + `<span>Ma orzeczenie:</span> ${chip('o', T.item.oUnit.text)}`);
+    buildTree(T.item); revealTree(T.labeled);
+    $('#graphSub').textContent = 'pełny rozbiór tego zdania';
+  }
+  if(!ok) feedback($('#feedback').innerHTML + '<span>Wróci za kilka przykładów.</span>');
+  render();
+}
+
+/* ---------- zdania złożone ---------- */
+function renderZloz(){
+  const it = T.item;
+  if(T.phase === 'ask'){
+    setPrompt('Zdanie pojedyncze czy złożone?', 'Policz orzeczenia: każde zdanie składowe ma własne.');
+    setActions([
+      {label:'Pojedyncze', choice:true, key:'1', onClick:() => answerZ(false)},
+      {label:'Złożone', choice:true, key:'2', onClick:() => answerZ(true)},
+    ]);
+  } else if(T.phase === 'paint'){
+    setPrompt('Pomaluj zdania składowe', 'Wybierz kolor i klikaj lub przeciągaj po wyrazach. Każde zdanie składowe ma własne orzeczenie. Spójników nie musisz malować.');
+    setActions([{label:'Sprawdź podział', primary:true, key:'Enter', id:'checkBtn', disabled:!T.paint.some(Boolean), onClick:checkPaint}]);
+  } else if(T.phase === 'type'){
+    setPrompt('Współrzędnie czy podrzędnie złożone?', 'Podrzędne odpowiada na pytanie zadane od zdania nadrzędnego. Współrzędne są równorzędne.');
+    setActions([
+      {label:'Współrzędnie', choice:true, key:'1', onClick:() => answerType('W')},
+      {label:'Podrzędnie', choice:true, key:'2', onClick:() => answerType('P')},
+    ]);
+  } else {
+    const name = !T.isZ ? 'To zdanie pojedyncze'
+      : it.type === 'W' ? 'Zdanie złożone współrzędnie' : it.type === 'P' ? 'Zdanie złożone podrzędnie' : 'Zdanie wielokrotnie złożone';
+    setPrompt(name, T.failed ? 'To zdanie wróci za kilka przykładów.' : '');
+    setActions([{label:'Dalej', primary:true, key:'Enter', onClick:start}]);
+  }
+}
+function answerZ(saysZ){
+  const ok = saysZ === T.isZ;
+  award(ok, 'zloz');
+  const head = ok ? good('Dobrze!') : bad('Nie tym razem.');
+  if(!T.isZ){
+    T.labeled = new Set(T.item.units.filter(u => u.tag !== 'x').map(u => u.id));
+    feedback(head + `<span>Jest tylko jedno orzeczenie:</span> ${chip('o', T.item.oUnit.text)}`);
+    buildTree(T.item); revealTree(T.labeled);
+    $('#graphSub').textContent = 'pełny rozbiór tego zdania';
+    T.phase = 'review';
+  } else {
+    feedback(head + `<span>To zdanie złożone: ma ${T.item.n} zdania składowe. Teraz je pomaluj.</span>`);
+    T.step = 1;
+    T.phase = 'paint';
+    setBrush(1);
+  }
+  render();
+}
+function checkPaint(){
+  const it = T.item, map = {}, used = {};
+  let ok = true;
+  it.words.forEach((w, i) => {
+    if(!w.clause) return;
+    const u = T.paint[i] || 0;
+    if(!u){ ok = false; return; }
+    if(map[w.clause] === undefined){
+      if(used[u] !== undefined) ok = false;
+      else { map[w.clause] = u; used[u] = w.clause; }
+    } else if(map[w.clause] !== u) ok = false;
+  });
+  it.words.forEach((w, i) => { if(w.clause && map[w.clause] !== (T.paint[i] || 0)) T.wrongW.add(i); });
+  if(ok) T.wrongW.clear();
+  award(ok, 'podzial');
+  T.truth = true;
+  feedback((ok ? good('Dobrze!') : bad('Nie tym razem.')) + '<span>' + (ok ? 'Podział na zdania składowe jest poprawny.' : 'Kolory pokazują poprawny podział; przekreślone wyrazy były źle przypisane.') + '</span>');
+  if(it.type === 'M'){ T.phase = 'review'; buildClauses(it); $('#graphSub').textContent = 'zdania składowe'; }
+  else { T.step = 2; T.phase = 'type'; }
+  render();
+}
+function answerType(t){
+  const it = T.item, ok = t === it.type;
+  award(ok, 'typ');
+  const why = it.type === 'W'
+    ? 'Zdania składowe są równorzędne — żadne nie dopowiada drugiego.'
+    : 'Zdanie podrzędne odpowiada na pytanie postawione od zdania nadrzędnego.';
+  feedback((ok ? good('Dobrze!') : bad('Nie tym razem.')) + `<span>${why}</span>`);
+  T.phase = 'review';
+  T.wrongW.clear();
+  buildClauses(it);
+  $('#graphSub').textContent = it.type === 'P' ? 'strzałka biegnie od zdania nadrzędnego do podrzędnego' : 'zdania składowe połączone spójnikami';
+  render();
+}
+
+/* ---------- zdarzenia ---------- */
+function setBrush(b){
+  brush = b;
+  $$('.brush').forEach(el => el.setAttribute('aria-pressed', String(+el.dataset.b === b)));
+}
+$$('.brush').forEach(el => el.addEventListener('click', () => setBrush(+el.dataset.b)));
+
+const sentenceEl = $('#sentence');
+sentenceEl.addEventListener('click', e => {
+  const w = e.target.closest('.w');
+  if(!w || !T || T.mode !== 'parse' || T.phase !== 'select') return;
+  const tok = T.item.toks[+w.dataset.i], u = T.item.units[tok.unit];
+  if(u.tag === 'x' || T.labeled.has(u.id)) return;
+  T.sel.has(u.id) ? T.sel.delete(u.id) : T.sel.add(u.id);
+  updateSentence();
+  const btn = $('#checkBtn'); if(btn) btn.disabled = !T.sel.size;
+});
+function paintAt(i){
+  if(T.paint[i] === paintVal) return;
+  T.paint[i] = paintVal;
+  updateSentence();
+  const btn = $('#checkBtn'); if(btn) btn.disabled = !T.paint.some(Boolean);
+}
+sentenceEl.addEventListener('pointerdown', e => {
+  if(!T || T.phase !== 'paint') return;
+  const w = e.target.closest('.w');
+  if(!w) return;
+  e.preventDefault();
+  const i = +w.dataset.i;
+  paintVal = (T.paint[i] || 0) === brush ? 0 : brush;
+  painting = true;
+  paintAt(i);
+});
+window.addEventListener('pointermove', e => {
+  if(!painting) return;
+  const el = document.elementFromPoint(e.clientX, e.clientY);
+  const w = el && el.closest && el.closest('#sentence .w');
+  if(w) paintAt(+w.dataset.i);
+});
+['pointerup', 'pointercancel'].forEach(ev => window.addEventListener(ev, () => painting = false));
+
+document.addEventListener('keydown', e => {
+  if(e.metaKey || e.ctrlKey || e.altKey) return;
+  if(e.target.closest && e.target.closest('input')) return;
+  if(e.key === 'Enter' && e.target.tagName === 'BUTTON') return;
+  const b = $$('#actions button').find(x => x.dataset.key === e.key && !x.disabled);
+  if(b){ e.preventDefault(); b.click(); return; }
+  if(T && T.phase === 'paint' && ['1', '2', '3'].includes(e.key)) setBrush(+e.key);
+});
+
+['parse', 'rown', 'zloz'].forEach(m => {
+  const cb = $('#mode-' + m);
+  cb.checked = !!S.modes[m];
+  cb.addEventListener('change', () => {
+    S.modes[m] = cb.checked;
+    if(!S.modes.parse && !S.modes.rown && !S.modes.zloz){ S.modes.parse = true; $('#mode-parse').checked = true; }
+    save();
+    if(T && !S.modes[T.mode] && (T.phase === 'ask' || T.phase === 'select') && !T.results.length) start();
+  });
+});
+$('#reset').addEventListener('click', () => {
+  if(!confirm('Wyzerować punkty i statystyki?')) return;
+  S.score = 0; S.best = 0; S.streak = 0;
+  CATS.forEach(([k]) => S.stats[k] = [0, 0]);
+  save(); renderHeader(); renderStats();
+});
+
+renderHeader();
+renderStats();
+start();
+if(document.fonts && document.fonts.ready) document.fonts.ready.then(() => {
+  if(!T) return;
+  if(T.mode === 'parse' || (T.item.kind === 'parse' && T.phase === 'review')){ buildTree(T.item); revealTree(T.labeled); }
+  else if(T.item.kind === 'z' && T.phase === 'review') buildClauses(T.item);
+});
+</script>
