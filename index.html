@@ -9,7 +9,7 @@
   --paper:#EEF2F6; --grid:rgba(70,110,160,.075); --card:#FFFFFF; --ink:#18202C; --muted:#5A6576;
   --line:#D3DBE5; --hover:#E6EDF6; --selbg:#FFEFA8; --selink:#6E5400;
   --good:#23804A; --bad:#C8352B;
-  --c-o:#B3265E; --c-s:#1F58B0; --c-d:#0B7F7A; --c-k:#A86300; --c-a:#6F45B5;
+  --c-o:#18202C; --c-s:#1F58B0; --c-d:#0B7F7A; --c-k:#A86300; --c-a:#6F45B5;
   --p1:#DCE7F8; --p1b:#1F58B0; --p2:#FBE3C4; --p2b:#A86300; --p3:#E7DCF6; --p3b:#6F45B5;
   --f-ui:"Atkinson Hyperlegible", system-ui, -apple-system, "Segoe UI", sans-serif;
   --f-text:"Literata", Georgia, "Times New Roman", serif;
@@ -20,7 +20,7 @@
   :root:not([data-theme="light"]){
     --paper:#10151D; --grid:rgba(140,170,210,.05); --card:#171E29; --ink:#E7ECF3; --muted:#9AA6B6;
     --line:#2A3443; --hover:#222C3A; --selbg:#4A3F12; --selink:#F2D36B; --good:#5CCB85; --bad:#FF6F61;
-    --c-o:#F0719F; --c-s:#74A6F2; --c-d:#3FC7C0; --c-k:#F0AE45; --c-a:#B58DF2;
+    --c-o:#E7ECF3; --c-s:#74A6F2; --c-d:#3FC7C0; --c-k:#F0AE45; --c-a:#B58DF2;
     --p1:#1D3150; --p1b:#74A6F2; --p2:#43300F; --p2b:#F0AE45; --p3:#33254C; --p3b:#B58DF2;
     color-scheme:dark;
   }
@@ -28,7 +28,7 @@
 :root[data-theme="dark"]{
   --paper:#10151D; --grid:rgba(140,170,210,.05); --card:#171E29; --ink:#E7ECF3; --muted:#9AA6B6;
   --line:#2A3443; --hover:#222C3A; --selbg:#4A3F12; --selink:#F2D36B; --good:#5CCB85; --bad:#FF6F61;
-  --c-o:#F0719F; --c-s:#74A6F2; --c-d:#3FC7C0; --c-k:#F0AE45; --c-a:#B58DF2;
+  --c-o:#E7ECF3; --c-s:#74A6F2; --c-d:#3FC7C0; --c-k:#F0AE45; --c-a:#B58DF2;
   --p1:#1D3150; --p1b:#74A6F2; --p2:#43300F; --p2b:#F0AE45; --p3:#33254C; --p3b:#B58DF2;
   color-scheme:dark;
 }
@@ -46,7 +46,7 @@ button{font:inherit; color:inherit}
 /* header */
 .top{display:flex; flex-wrap:wrap; justify-content:space-between; align-items:flex-end; gap:12px 24px}
 .brand h1{margin:0; font:600 clamp(1.7rem,4vw,2.3rem)/1.05 var(--f-text); letter-spacing:-.01em}
-.brand h1 em{font-weight:500; color:var(--c-o)}
+.brand h1 em{font-weight:500; color:var(--c-s)}
 .brand p{margin:4px 0 0; color:var(--muted); font-size:.9rem}
 .scorebox{display:flex; align-items:flex-end; gap:18px; flex-wrap:wrap}
 .score{position:relative; font:700 2.8rem/1 var(--f-hand); font-variant-numeric:tabular-nums; min-width:3ch; text-align:right}
@@ -63,13 +63,19 @@ button{font:inherit; color:inherit}
   box-shadow:0 1px 0 var(--line), 0 12px 30px -18px rgba(20,40,70,.25); display:grid; gap:14px}
 .taskhead{display:flex; flex-wrap:wrap; align-items:center; gap:8px 12px}
 .chip{font-size:.72rem; font-weight:700; letter-spacing:.09em; text-transform:uppercase; color:var(--muted)}
-.return{font:700 1.15rem/1 var(--f-hand); color:var(--bad); transform:rotate(-3deg)}
+.return{font:700 1.15rem/1 var(--f-hand); color:var(--c-k); transform:rotate(-3deg)}
 .steps{display:flex; gap:6px; flex-wrap:wrap; margin-left:auto}
 .st{font-size:.72rem; padding:2px 8px; border-radius:4px; border:1px solid var(--line); color:var(--muted); white-space:nowrap}
 .st.cur{border-color:var(--ink); color:var(--ink); font-weight:700}
 .st.ok{border-color:transparent; background:color-mix(in srgb,var(--good) 16%,transparent); color:var(--good)}
 .st.bad{border-color:transparent; background:color-mix(in srgb,var(--bad) 16%,transparent); color:var(--bad)}
-#prompt{margin:0; font:600 clamp(1.25rem,3vw,1.6rem)/1.2 var(--f-text); text-wrap:balance}
+#prompt{margin:0; font:400 clamp(1.25rem,3vw,1.6rem)/1.2 var(--f-text); text-wrap:balance}
+#prompt b{font-weight:700}
+.prow{position:relative; display:flex; align-items:center; gap:10px}
+.help{flex:none; width:1.6rem; height:1.6rem; border-radius:50%; border:1.5px solid var(--muted); background:var(--card); color:var(--muted); font:700 .9rem/1 var(--f-ui); cursor:help; display:grid; place-items:center; padding:0}
+.help:hover,.help.open{border-color:var(--ink); color:var(--ink)}
+.tip{position:absolute; top:calc(100% + 8px); left:0; z-index:5; max-width:min(34rem,100%); background:var(--ink); color:var(--card); font-size:.9rem; line-height:1.45; padding:10px 14px; border-radius:6px; box-shadow:0 10px 24px -12px rgba(0,0,0,.4); opacity:0; visibility:hidden; transition:opacity .15s, visibility .15s}
+.help:hover + .tip, .help:focus-visible + .tip, .help.open + .tip{opacity:1; visibility:visible}
 .hint{margin:-6px 0 0; color:var(--muted); font-size:.92rem; max-width:65ch}
 
 /* sentence */
@@ -80,7 +86,7 @@ button{font:inherit; color:inherit}
 .w.click:hover{background:var(--hover)}
 .w.sel{background:var(--selbg); color:var(--selink)}
 .w[data-t]{color:var(--tc); text-decoration-line:underline; text-decoration-color:var(--tc); text-decoration-thickness:2px; text-underline-offset:.3em}
-.w[data-t="o"]{--tc:var(--c-o); text-decoration-style:double; text-decoration-thickness:1.5px}
+.w[data-t="o"]{--tc:var(--c-o); font-weight:600; text-decoration-style:double; text-decoration-thickness:1.5px}
 .w[data-t="s"]{--tc:var(--c-s); text-decoration-style:solid}
 .w[data-t="d"]{--tc:var(--c-d); text-decoration-style:dashed}
 .w[data-t="k"]{--tc:var(--c-k); text-decoration-style:dotted; text-decoration-thickness:3px}
@@ -93,6 +99,11 @@ button{font:inherit; color:inherit}
 .w.pc2{background:var(--p2); box-shadow:inset 0 -3px var(--p2b)}
 .w.pc3{background:var(--p3); box-shadow:inset 0 -3px var(--p3b)}
 .w.miss.pc1,.w.miss.pc2,.w.miss.pc3{color:var(--ink)}
+.w.hl-dep{background:var(--selbg); color:var(--selink); box-shadow:inset 0 -2px var(--selink)}
+.w.hl-head{box-shadow:inset 0 0 0 1.5px var(--muted)}
+.gap{display:inline-block; min-width:1.2em; padding:0 .15em; text-align:center; border:1.5px dashed var(--muted); border-radius:4px; margin-left:.08em; line-height:1.25; color:var(--muted); font-weight:600}
+.gap.yes{border-style:solid; border-color:var(--good); color:var(--good)}
+.gap.no{border-style:solid; border-color:var(--line); color:var(--muted); text-decoration:line-through}
 .sentence.painting{touch-action:none; user-select:none; -webkit-user-select:none}
 .sentence.painting .w{cursor:crosshair}
 .sentence.painting .w:hover{outline:1.5px dashed var(--muted)}
@@ -178,7 +189,11 @@ h3{margin:0; font:600 1.1rem var(--f-text)}
       <span class="return" id="retNote" hidden>powtórka</span>
       <div class="steps" id="steps"></div>
     </div>
-    <h2 id="prompt">…</h2>
+    <div class="prow">
+      <h2 id="prompt">…</h2>
+      <button type="button" class="help" id="help" aria-label="Podpowiedź" aria-describedby="tip">?</button>
+      <div class="tip" id="tip" role="tooltip"></div>
+    </div>
     <p class="hint" id="hint"></p>
     <div class="sentence" id="sentence"></div>
     <div class="brushes" id="brushes" hidden>
@@ -215,6 +230,10 @@ h3{margin:0; font:600 1.1rem var(--f-text)}
         <label><input type="checkbox" id="mode-parse" checked> części zdania</label>
         <label><input type="checkbox" id="mode-rown" checked> równoważniki</label>
         <label><input type="checkbox" id="mode-zloz" checked> zdania złożone</label>
+        <label><input type="checkbox" id="mode-przec" checked> przecinki</label>
+        <label><input type="checkbox" id="mode-cel" checked> cel wypowiedzi</label>
+        <label><input type="checkbox" id="mode-dopok" checked> dopełnienie czy okolicznik</label>
+        <label><input type="checkbox" id="mode-zwiazek" checked> związki wyrazowe</label>
       </fieldset>
       <button class="link-btn" id="reset">Wyzeruj wyniki</button>
     </div>
@@ -490,6 +509,25 @@ Z_powodu/k:p choroby/k:p Ola/s została/o w_domu/k.
 *Wszędzie/k leży/o śnieg/s.
 *Lekcja/s się_skończyła/o.
 *Palenie/s jest_zabronione/o.
+Spotkajmy_się/o o_17.00/k przy_galerii/k handlowej/a-.
+Maciek/s przygląda_się/o psu/d.
+Pies/s przygląda_się/o Maćkowi/d.
+Tomek/s podał/o siostrze/d dwie/a+2 małe/a+ piłki/d.
+Siostra/s Tomka/a- podała/o mu/d dwie/a+2 małe/a+ piłki/d.
+Siostra/s podała/o Tomkowi/d dwie/a+2 małe/a+ piłki/d.
+Wracam/o do_rodziców/d.
+Wracam/o do_domu/k.
+Jestem/o w_pokoju/k.
+Wczoraj/k oglądałem/o bardzo/k+ interesujący/a+ program/d.
+Mam/o w/k:t tym/a+ czasie/k:t trening/d.
+Przygotowuję_się/o do_zawodów/d.
+Chodźmy/o po_południu/k do_kina/k!
+Zostanę/o:z twoim/a+ przyjacielem/o:z.
+Czy/x zostaniesz/o:z moim/a+ przyjacielem/o:z?
+Zostań/o:z moim/a+ przyjacielem/o:z!
+Lena/s okazała_się_odpowiedzialna/o.
+Kuzyn/s biegł/o szybko/k.
+Spotkałem/o mamę/d Tomka/a-.
 `;
 
 /* Równoważniki zdań — brak osobowej formy czasownika */
@@ -554,45 +592,46 @@ Herbata z cytryną dla mnie.
 W szkole dzień otwarty.
 Jutro sprawdzian z historii.
 Precz z nudą!
+O 17.00 przy galerii handlowej.
 `;
 
 /* Zdania złożone: typ|zdanie; [N … ] = zdanie składowe N, słowa poza nawiasami (spójniki) nie są oceniane.
    W — współrzędnie, P — podrzędnie (1 = nadrzędne), M — wielokrotnie złożone (bez pytania o rodzaj) */
 const ZLOZ_DATA = `
-W|[1 Zadzwonił telefon], więc [2 odebrałam go].
-W|[1 Pada deszcz], a [2 my siedzimy w domu].
-W|[1 Ala czyta książkę], a [2 Ola rysuje].
-W|[1 Wstałem wcześnie] i [2 poszedłem pobiegać].
-W|[1 Chciałem przyjść], ale [2 zachorowałem].
+Ww|[1 Zadzwonił telefon], więc [2 odebrałam go].
+Wp|[1 Pada deszcz], a [2 my siedzimy w domu].
+Wp|[1 Ala czyta książkę], a [2 Ola rysuje].
+Wl|[1 Wstałem wcześnie] i [2 poszedłem pobiegać].
+Wp|[1 Chciałem przyjść], ale [2 zachorowałem].
 W|[1 Słońce zaszło], [2 zrobiło się chłodno].
-W|Albo [1 pójdziemy do kina], albo [2 zostaniemy w domu].
-W|[1 Tata gotuje obiad], a [2 mama nakrywa do stołu].
-W|[1 Było późno], więc [2 dzieci poszły spać].
-W|[1 Uczyłem się długo], dlatego [2 dostałem piątkę].
-W|[1 Zima się skończyła] i [2 nadeszła wiosna].
-W|[1 Janek lubi piłkę nożną], lecz [2 jego brat woli koszykówkę].
+Wr|Albo [1 pójdziemy do kina], albo [2 zostaniemy w domu].
+Wp|[1 Tata gotuje obiad], a [2 mama nakrywa do stołu].
+Ww|[1 Było późno], więc [2 dzieci poszły spać].
+Ww|[1 Uczyłem się długo], dlatego [2 dostałem piątkę].
+Wl|[1 Zima się skończyła] i [2 nadeszła wiosna].
+Wp|[1 Janek lubi piłkę nożną], lecz [2 jego brat woli koszykówkę].
 W|[1 Zgasło światło], [2 w pokoju zrobiło się ciemno].
 W|Nie tylko [1 ładnie śpiewa], ale też [2 gra na gitarze].
-W|[1 Zadzwoniłem do Kasi], lecz [2 nie odebrała].
+Wp|[1 Zadzwoniłem do Kasi], lecz [2 nie odebrała].
 W|[1 Wiatr wiał mocno], [2 drzewa się kołysały].
-W|[1 Mama jest w pracy], a [2 tata jest w domu].
-W|[1 Pies zaczął ujadać], więc [2 złodziej uciekł].
-W|[1 Spieszyłem się], a jednak [2 spóźniłem się na autobus].
-W|[1 Skończyły się lekcje] i [2 uczniowie wybiegli ze szkoły].
-W|[1 Zabrzmiał dzwonek], więc [2 wróciliśmy do klasy].
-W|[1 Obiad był gotowy], zatem [2 usiedliśmy do stołu].
-W|[1 Ola się uczy], a [2 jej brat gra na komputerze].
-W|[1 Byłem zmęczony], toteż [2 szybko zasnąłem].
-W|[1 Kot miauczał] i [2 drapał drzwi].
-W|[1 Dzieci śpiewały] i [2 tańczyły].
-W|[1 Chłopcy biegali po boisku] i [2 głośno krzyczeli].
+Wp|[1 Mama jest w pracy], a [2 tata jest w domu].
+Ww|[1 Pies zaczął ujadać], więc [2 złodziej uciekł].
+Wp|[1 Spieszyłem się], a jednak [2 spóźniłem się na autobus].
+Wl|[1 Skończyły się lekcje] i [2 uczniowie wybiegli ze szkoły].
+Ww|[1 Zabrzmiał dzwonek], więc [2 wróciliśmy do klasy].
+Ww|[1 Obiad był gotowy], zatem [2 usiedliśmy do stołu].
+Wp|[1 Ola się uczy], a [2 jej brat gra na komputerze].
+Ww|[1 Byłem zmęczony], toteż [2 szybko zasnąłem].
+Wl|[1 Kot miauczał] i [2 drapał drzwi].
+Wl|[1 Dzieci śpiewały] i [2 tańczyły].
+Wl|[1 Chłopcy biegali po boisku] i [2 głośno krzyczeli].
 W|[1 Kupiłem bilet], [2 wsiadłem do pociągu], [3 pojechałem nad morze].
 W|[1 Deszcz przestał padać], [2 wyszło słońce], [3 na niebie pojawiła się tęcza].
-W|[1 Było ciepło], ale [2 wiał silny wiatr].
-W|[1 Marek zgubił klucze], więc [2 nie mógł wejść do domu].
-W|[1 Babcia robi na drutach], a [2 dziadek czyta gazetę].
-W|[1 Nie lubię zimy], natomiast [2 uwielbiam lato].
-W|[1 Wszedł do klasy], [2 usiadł w ławce] i [3 otworzył zeszyt].
+Wp|[1 Było ciepło], ale [2 wiał silny wiatr].
+Ww|[1 Marek zgubił klucze], więc [2 nie mógł wejść do domu].
+Wp|[1 Babcia robi na drutach], a [2 dziadek czyta gazetę].
+Wp|[1 Nie lubię zimy], natomiast [2 uwielbiam lato].
+Wl|[1 Wszedł do klasy], [2 usiadł w ławce] i [3 otworzył zeszyt].
 P|[1 Wiem], że [2 masz rację].
 P|Kiedy [2 wróciłem do domu], [1 mama spała].
 P|[1 Nie poszedłem do szkoły], bo [2 byłem chory].
@@ -637,20 +676,107 @@ P|[1 Nie rozumiem], dlaczego [2 się złościsz].
 M|Gdy [2 wróciłem ze szkoły], [1 zjadłem obiad] i [3 odrobiłem lekcje].
 M|[1 Wiem], że [2 jesteś zmęczony], ale [3 musimy jeszcze posprzątać].
 M|[1 Zosia powiedziała], że [2 przyjdzie], jeśli [3 skończy pracę].
+Wl|[1 Pójdziemy jutro do sklepu] i [2 kupimy nową konsolę].
+Wp|[1 Pójdziemy jutro do sklepu], ale [2 nie kupimy nowej konsoli].
+Wl|[1 Odrobię pracę domową] i [2 wyjdę na dwór].
+Wr|[1 Pogram w piłkę] albo [2 pójdę do skateparku].
+Wp|[1 Planujemy piknik], ale [2 podobno ma padać].
+Ww|[1 Zrobiliśmy zakupy], więc [2 niczego nam nie zabrakło].
+Wr|[1 Pójdziemy do kina] albo [2 obejrzymy film w domu], albo [3 spotkamy się ze znajomymi].
+Wp|[1 Cały dzień padał śnieg], a jednak [2 Julka poszła na rower].
+Ww|[1 Cały dzień padał śnieg], więc [2 Lena nie poszła na rower].
+Wl|[1 Tomek świetnie rysuje] i [2 umie śpiewać].
+Wp|[1 Ignacy świetnie rysuje], ale [2 nie umie śpiewać].
+Wl|[1 W sobotę spotkałam znajomych z wakacji] i [2 poszliśmy razem do parku].
+Ww|[1 Po jakimś czasie zaczął padać deszcz], więc [2 udaliśmy się do ulubionej kawiarni].
+Wp|[1 Chcieliśmy zamówić ciasto marchewkowe], jednak [2 dla wszystkich go nie wystarczyło].
+Wl|[1 Zjedliśmy wobec tego szarlotkę] i [2 napiliśmy się herbaty].
+Ww|[1 W tym czasie zaczęło się przejaśniać], toteż [2 kawiarnia opustoszała].
+Ww|[1 Postanowiliśmy skorzystać z dobrej pogody], dlatego [2 poszliśmy nad morze].
+Wr|[1 Zadzwonisz do mnie] lub [2 napiszesz wiadomość].
+Wr|Albo [1 posprzątasz pokój], albo [2 nie pójdziesz na boisko].
+Wr|Bądź [1 pojedziemy w góry], bądź [2 zostaniemy nad jeziorem].
+Wr|[1 Pojedziemy autobusem] lub [2 pójdziemy pieszo].
+Wr|[1 Zjesz zupę] czy [2 wolisz kanapkę]?
+Wl|[1 Mama upiekła ciasto] oraz [2 przygotowała sałatkę].
+Ww|[1 Zaspałem], dlatego [2 spóźniłem się do szkoły].
+Wp|[1 Kasia lubi matematykę], natomiast [2 jej siostra woli biologię].
+Wp|[1 Było zimno], lecz [2 nikt nie narzekał].
+Wl|[1 Świeciło słońce] i [2 śpiewały ptaki].
+P|[1 Spotkajmy się o 17.00 przy galerii handlowej], bo [2 stamtąd będziemy mieć blisko do kina].
+P|[1 Nikt się nie domyślał], że [2 Tomek jest tak utalentowany].
+P|[1 Umawialiśmy się], że [2 konsolę dostaniesz dopiero na urodziny].
 M|[1 Pies], [2 którego znaleźliśmy], [1 był głodny], więc [3 daliśmy mu jeść].
+`;
+
+/* Cel wypowiedzi: O — oznajmujące, P — pytające, R — rozkazujące */
+const CEL_DATA = `
+O|Zostanę twoim przyjacielem.
+P|Czy zostaniesz moim przyjacielem?
+R|Zostań moim przyjacielem!
+R|Chodźmy po południu do kina!
+O|Mam w tym czasie trening.
+P|A nie możesz raz opuścić zajęć?
+O|Przygotowuję się do zawodów.
+R|Spotkajmy się o 17.00 przy galerii handlowej.
+O|Jutro jedziemy na wycieczkę.
+P|O której godzinie zaczyna się film?
+R|Zamknij okno, proszę.
+O|Kasia lubi czytać kryminały.
+P|Gdzie położyłeś moje klucze?
+R|Nie rozmawiajcie na lekcji!
+O|W parku zakwitły kasztany.
+P|Dlaczego się spóźniłeś?
+R|Podaj mi sól.
+O|Wczoraj padał deszcz.
+P|Kto zjadł ostatnie ciastko?
+R|Wyprowadź psa na spacer.
+O|Pociąg przyjechał punktualnie.
+P|Czy lubisz pływać?
+R|Posprzątaj swój pokój!
+O|Mój brat gra na gitarze.
+P|Jak masz na imię?
+R|Pomóżcie mi nieść zakupy.
+O|Nasza drużyna wygrała mecz.
+P|Ile kosztuje ten zeszyt?
+R|Uważaj na schodach!
+O|Babcia upiekła szarlotkę.
+P|Pójdziesz ze mną do kina?
+R|Niech każdy weźmie kartkę.
+O|Za oknem pada śnieg!
+P|Masz chwilę?
+R|Chodź tu natychmiast!
+O|Uwielbiam wakacje nad morzem!
+P|Czemu nic nie mówisz?
+R|Weźcie ze sobą parasole.
+O|Tata naprawił rower.
+P|Co robisz w sobotę?
+R|Otwórzcie podręczniki na stronie dziesiątej.
+O|Tomek świetnie rysuje.
+P|Kiedy wrócisz z wakacji?
+R|Nie zapomnij o zadaniu domowym!
+O|Lena okazała się odpowiedzialna.
+P|Zjesz zupę?
+R|Przynieś mi książkę.
+O|Pojedziemy nad jezioro.
+P|Czyj to plecak?
+R|Cisza!
+O|Nikt się nie domyślał, że Tomek jest tak utalentowany.
+P|Czy wiesz, gdzie jest dworzec?
+R|Zadzwoń, kiedy dojedziesz.
 `;
 
 /* ---------- parsowanie danych ---------- */
 const TAGS = {
-  o:{name:'orzeczenie', lab:'orzecz.', short:'orzecz.', prompt:'Zaznacz orzeczenie', none:null,
+  o:{name:'orzeczenie', lab:'orzecz.', short:'orzecz.', prompt:'Zaznacz <b>orzeczenie</b>', none:null,
      q:'Co robi? Co się z nim dzieje? W jakim jest stanie? Razem z nim zaznacz „nie”, „się” i łącznik („jest”, „był”…).'},
-  s:{name:'podmiot', lab:'podmiot', short:'podmiot', prompt:'Zaznacz podmiot', none:'Brak podmiotu',
+  s:{name:'podmiot', lab:'podmiot', short:'podmiot', prompt:'Zaznacz <b>podmiot</b>', none:'Brak podmiotu – podmiot domyślny',
      q:'Kto? Co? Wykonawca czynności, zwykle w mianowniku. Jeśli go nie ma, to podmiot domyślny albo zdanie bezpodmiotowe.'},
-  d:{name:'dopełnienie', lab:'dopełn.', short:'dopełn.', prompt:'Zaznacz wszystkie dopełnienia', none:'Brak dopełnień',
+  d:{name:'dopełnienie', lab:'dopełn.', short:'dopełn.', prompt:'Zaznacz wszystkie <b>dopełnienia</b>', none:'Brak dopełnień',
      q:'Kogo? Czego? Komu? Czemu? Kogo? Co? Kim? Czym? O kim? O czym? Uzupełnia czasownik.'},
-  k:{name:'okolicznik', lab:'okol.', short:'okol.', prompt:'Zaznacz wszystkie okoliczniki', none:'Brak okoliczników',
+  k:{name:'okolicznik', lab:'okol.', short:'okol.', prompt:'Zaznacz wszystkie <b>okoliczniki</b>', none:'Brak okoliczników',
      q:'Gdzie? Kiedy? Jak? Dlaczego? Po co? W jakim stopniu? Opisuje okoliczności czynności lub cechy.'},
-  a:{name:'przydawka', lab:'przyd.', short:'przyd.', prompt:'Zaznacz wszystkie przydawki', none:'Brak przydawek',
+  a:{name:'przydawka', lab:'przyd.', short:'przyd.', prompt:'Zaznacz wszystkie <b>przydawki</b>', none:'Brak przydawek',
      q:'Jaki? Który? Czyj? Ile? Z czego? Określa rzeczownik.'},
 };
 const STEPS = ['o','s','d','k','a'];
@@ -711,8 +837,9 @@ function splitPlain(line){
 }
 
 function parseZ(line, idx){
-  const type = line[0], body = line.slice(2);
-  if(!'WPM'.includes(type) || line[1] !== '|') throw new Error(`złożone ${idx}: brak typu`);
+  const head = line.match(/^([WPM])([lrpw]?)\|/);
+  if(!head) throw new Error(`złożone ${idx}: brak typu`);
+  const type = head[1], sub = head[2] || null, body = line.slice(head[0].length);
   const re = /\[(\d)|\]|[^\s\[\]]+/g;
   let m, cur = 0; const words = [];
   while((m = re.exec(body))){
@@ -726,7 +853,7 @@ function parseZ(line, idx){
   }
   const n = Math.max(...words.map(w => w.clause));
   if(n < 2) throw new Error(`złożone ${idx}: mniej niż 2 zdania składowe`);
-  return {kind:'z', type, words, n};
+  return {kind:'z', type, sub, words, n};
 }
 
 const lines = s => s.split('\n').map(l => l.trim()).filter(Boolean);
@@ -735,6 +862,46 @@ const ROWN = lines(ROWN_DATA).map(l => ({kind:'r', words:splitPlain(l)}));
 const ZLOZ = lines(ZLOZ_DATA).map(parseZ);
 const TRAPS = PARSED.map((p, i) => p.trap ? i : -1).filter(i => i >= 0);
 const TRICKY = PARSED.map((p, i) => p.toks.some(t => t.tag === 'x' || t.punct === ',') ? i : -1).filter(i => i >= 0);
+
+/* cel wypowiedzi */
+const CEL = lines(CEL_DATA).map(l => ({kind:'r', cel:l[0], words:splitPlain(l.slice(2))}));
+
+/* dopełnienie czy okolicznik — wyrażenia przyimkowe wyciągnięte z rozbiorów */
+const PREP = new Set('w we na do z ze o od po przed przy pod nad za przez dla bez u obok między spod zza ku'.split(' '));
+const startsWithPrep = u => PREP.has(u.text.split(' ')[0].toLowerCase());
+const DOPOK = [];
+PARSED.forEach((p, pi) => p.units.forEach(u => {
+  if((u.tag === 'd' || u.tag === 'k') && startsWithPrep(u)) DOPOK.push({p:pi, u:u.id, tag:u.tag});
+}));
+
+/* związki wyrazowe: Z — zgody, R — rządu, P — przynależności */
+const ZW = {Z:[], R:[], P:[]};
+PARSED.forEach((p, pi) => {
+  const subjects = p.units.filter(u => u.tag === 's');
+  p.units.forEach(u => {
+    if(u.head === null) return;
+    const h = p.units[u.head];
+    if(u.tag === 's' && subjects.length === 1) ZW.Z.push({p:pi, head:h.id, dep:u.id});
+    else if(u.tag === 'd' && h.tag === 'o') ZW.R.push({p:pi, head:h.id, dep:u.id});
+    else if(u.tag === 'a' && u.spec && u.spec.off > 0 && u.toks.length === 1) ZW.Z.push({p:pi, head:h.id, dep:u.id});
+    else if(u.tag === 'k'){
+      const hasKids = p.units.some(v => v.head === u.id);
+      const adverb = u.toks.length === 1 && !u.text.includes(' ') && !/(ą|em|om|ami)$/.test(u.text) && !hasKids;
+      if(startsWithPrep(u) || adverb) ZW.P.push({p:pi, head:h.id, dep:u.id});
+    }
+  });
+});
+const ZW_ALL = [...ZW.Z.map(x => ({...x, type:'Z'})), ...ZW.R.map(x => ({...x, type:'R'})), ...ZW.P.map(x => ({...x, type:'P'}))];
+
+/* przecinek przed spójnikiem w zdaniach współrzędnie złożonych */
+const COMMA_YES = new Set('a ale lecz więc dlatego natomiast jednak zatem toteż'.split(' '));
+const PRZEC = [];
+ZLOZ.forEach((z, zi) => {
+  if(z.type !== 'W') return;
+  z.words.forEach((w, i) => {
+    if(i > 0 && w.clause === 0 && z.words[i-1].clause !== 0) PRZEC.push({z:zi, gap:i, comma:z.words[i-1].punct.includes(',')});
+  });
+});
 
 /* ---------- SVG ---------- */
 const NS = 'http://www.w3.org/2000/svg';
@@ -856,9 +1023,14 @@ function buildClauses(item){
     for(let i = 0; i < cl.length - 1; i++){
       const a = cl[i], b = cl[i+1], y = pos[a.c].y + H/2;
       const x1 = pos[a.c].x + a.w/2, x2 = pos[b.c].x - b.w/2;
-      const g = svgEl('g', {class:'link on'}, svg);
+      const mid = (x1 + x2) / 2, sub = item.sub;
+      const g = svgEl('g', {class:'link on dash'}, svg);
       svgEl('line', {x1, y1:y, x2, y2:y}, g);
-      svgEl('text', {x:(x1 + x2)/2, y:y - 8, class:'elab'}, svg).textContent = b.conj || '—';
+      const arrow = (xa, xb) => svgEl('path', {d:`M${xa},${y} L${xb},${y}`, class:'edge on', 'marker-end':'url(#arr)'}, svg);
+      if(sub === 'r'){ arrow(mid - 2, x1 + 2); arrow(mid + 2, x2 - 2); }
+      else if(sub === 'p'){ arrow(x1 + 2, mid - 3); arrow(x2 - 2, mid + 3); }
+      else if(sub === 'w'){ arrow(x1 + 2, mid - 3); arrow(mid + 3, x2 - 2); }
+      svgEl('text', {x:mid, y:y - 10, class:'elab'}, svg).textContent = b.conj || '—';
     }
   }
   cl.forEach(k => drawNode(svg, 'on cl-' + k.c, pos[k.c].x, pos[k.c].y, k.w, H, k.t, lab(k.c), k.c));
@@ -870,17 +1042,20 @@ const $$ = s => [...document.querySelectorAll(s)];
 const esc = s => s.replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const STORE = 'pajeczynka-zdania-v1';
 const CATS = [['o','Orzeczenie'],['s','Podmiot'],['d','Dopełnienie'],['k','Okolicznik'],['a','Przydawka'],
-  ['rown','Zdanie czy równoważnik'],['zloz','Pojedyncze czy złożone'],['podzial','Zdania składowe'],['typ','Rodzaj złożenia']];
+  ['rown','Zdanie czy równoważnik'],['zloz','Pojedyncze czy złożone'],['podzial','Zdania składowe'],['typ','Rodzaj złożenia'],
+  ['wsp','Rodzaj współrzędnego'],['przec','Przecinek przed spójnikiem'],['cel','Cel wypowiedzi'],['dopok','Dopełnienie czy okolicznik'],['zwiazek','Związki wyrazowe']];
+const MODES = {parse:.38, dopok:.1, zwiazek:.1, rown:.1, cel:.08, zloz:.16, przec:.08};
 
-const S = {score:0, best:0, streak:0, stats:{}, modes:{parse:true, rown:true, zloz:true}};
+const S = {score:0, best:0, streak:0, stats:{}, modes:{}};
 try { Object.assign(S, JSON.parse(localStorage.getItem(STORE)) || {}); } catch(e) {}
+S.modes = Object.assign(Object.fromEntries(Object.keys(MODES).map(m => [m, true])), S.modes);
 CATS.forEach(([k]) => S.stats[k] = S.stats[k] || [0, 0]);
 S.streak = 0;
 function save(){ try { localStorage.setItem(STORE, JSON.stringify({score:S.score, best:S.best, stats:S.stats, modes:S.modes})); } catch(e) {} }
 
 let round = 0, T = null, lastKey = null, brush = 1, painting = false, paintVal = 1;
 const pending = [];
-const decks = {p:[], r:[], z:[]};
+const decks = {p:[], r:[], z:[], c:[], do:[], pr:[]};
 function draw(name, size){
   if(!decks[name].length){
     decks[name] = [...Array(size).keys()];
@@ -889,13 +1064,13 @@ function draw(name, size){
   return decks[name].pop();
 }
 const rnd = a => a[Math.floor(Math.random() * a.length)];
-const modeOf = key => ({p:'parse', r:'rown', rn:'rown', z:'zloz', zn:'zloz'})[key.split(':')[0]];
+const modeOf = key => ({p:'parse', r:'rown', rn:'rown', z:'zloz', zn:'zloz', c:'cel', do:'dopok', zw:'zwiazek', pr:'przec'})[key.split(':')[0]];
 
 function pickKey(){
   round++;
   const di = pending.findIndex(p => p.due <= round && S.modes[modeOf(p.key)] && p.key !== lastKey);
   if(di >= 0) return {key:pending.splice(di, 1)[0].key, repeat:true};
-  const w = [['parse', .64], ['rown', .18], ['zloz', .18]].filter(([m]) => S.modes[m]);
+  const w = Object.entries(MODES).filter(([m]) => S.modes[m]);
   const total = w.reduce((s, [, v]) => s + v, 0);
   let r = Math.random() * total, mode = w[0][0];
   for(const [m, v] of w){ if((r -= v) <= 0){ mode = m; break; } }
@@ -904,6 +1079,13 @@ function pickKey(){
     if(mode === 'parse') key = 'p:' + draw('p', PARSED.length);
     else if(mode === 'rown') key = Math.random() < .55 ? 'r:' + draw('r', ROWN.length)
       : 'rn:' + (Math.random() < .5 ? rnd(TRAPS) : rnd(PARSED.map((_, i) => i)));
+    else if(mode === 'cel') key = 'c:' + draw('c', CEL.length);
+    else if(mode === 'dopok') key = 'do:' + draw('do', DOPOK.length);
+    else if(mode === 'przec') key = 'pr:' + draw('pr', PRZEC.length);
+    else if(mode === 'zwiazek'){
+      const pool = ZW[rnd(['Z', 'R', 'P'])], x = rnd(pool);
+      key = 'zw:' + ZW_ALL.findIndex(y => y.p === x.p && y.dep === x.dep);
+    }
     else key = Math.random() < .62 ? 'z:' + draw('z', ZLOZ.length)
       : 'zn:' + (Math.random() < .6 ? rnd(TRICKY) : Math.floor(Math.random() * PARSED.length));
     if(key !== lastKey) break;
@@ -922,6 +1104,19 @@ function makeTask({key, repeat}){
     const it = ZLOZ[idx];
     return {...base, mode:'zloz', item:it, isZ:true, phase:'ask', paint:[], truth:false, wrongW:new Set(),
       stepDefs:[{label:'budowa'}, {label:'podział'}, ...(it.type !== 'M' ? [{label:'rodzaj'}] : [])]};
+  }
+  if(k === 'c') return {...base, mode:'cel', item:CEL[idx], phase:'ask', stepDefs:[{label:'cel'}]};
+  if(k === 'do'){
+    const x = DOPOK[idx];
+    return {...base, mode:'dopok', item:PARSED[x.p], target:x, phase:'ask', stepDefs:[{label:'funkcja'}]};
+  }
+  if(k === 'zw'){
+    const x = ZW_ALL[idx];
+    return {...base, mode:'zwiazek', item:PARSED[x.p], pair:x, phase:'ask', stepDefs:[{label:'związek'}]};
+  }
+  if(k === 'pr'){
+    const x = PRZEC[idx];
+    return {...base, mode:'przec', item:ZLOZ[x.z], gap:x, phase:'ask', paint:[], truth:false, wrongW:new Set(), stepDefs:[{label:'przecinek'}]};
   }
   return {...base, mode:'zloz', item:PARSED[idx], isZ:false, phase:'ask', stepDefs:[{label:'budowa'}]};
 }
@@ -971,7 +1166,16 @@ function renderSteps(){
     return `<span class="st ${cls}">${d.label}</span>`;
   }).join('');
 }
-function setPrompt(title, hint){ $('#prompt').textContent = title; $('#hint').innerHTML = hint || ''; $('#hint').hidden = !hint; }
+function setPrompt(title, tip, info){
+  $('#prompt').innerHTML = title;
+  $('#tip').innerHTML = tip || '';
+  $('#help').hidden = !tip;
+  $('#help').classList.remove('open');
+  $('#hint').innerHTML = info || '';
+  $('#hint').hidden = !info;
+}
+$('#help').addEventListener('click', e => { e.currentTarget.classList.toggle('open'); });
+document.addEventListener('click', e => { if(!e.target.closest('#help')) $('#help').classList.remove('open'); });
 function setActions(list){
   const box = $('#actions');
   box.innerHTML = '';
@@ -993,9 +1197,12 @@ const chip = (tag, text) => `<span class="tchip" style="--tc:var(--c-${tag})">${
 
 function sentenceWords(){ return T.item.kind === 'parse' ? T.item.toks : T.item.words; }
 function renderSentence(){
-  $('#sentence').innerHTML = sentenceWords().map((w, i) =>
-    `<span class="tk"><span class="w" data-i="${i}">${esc(w.text)}</span>${w.punct ? `<span class="p">${esc(w.punct)}</span>` : ''}</span>`
-  ).join(' ');
+  const g = T.mode === 'przec' ? T.gap.gap : -1;
+  $('#sentence').innerHTML = sentenceWords().map((w, i) => {
+    const punct = i === g - 1 ? w.punct.replace(',', '') : w.punct;
+    const gap = i === g - 1 ? '<span class="gap" id="gap">?</span>' : '';
+    return `<span class="tk"><span class="w" data-i="${i}">${esc(w.text)}</span>${punct ? `<span class="p">${esc(punct)}</span>` : ''}${gap}</span>`;
+  }).join(' ');
 }
 function updateSentence(){
   const it = T.item;
@@ -1008,6 +1215,8 @@ function updateSentence(){
       el.classList.toggle('click', T.mode === 'parse' && T.phase === 'select' && u.tag !== 'x' && !T.labeled.has(u.id));
       el.classList.toggle('sel', T.sel.has(u.id));
       el.classList.toggle('miss', T.miss.has(u.id));
+      el.classList.toggle('hl-dep', (T.mode === 'dopok' && T.target.u === u.id) || (T.mode === 'zwiazek' && T.pair.dep === u.id));
+      el.classList.toggle('hl-head', T.mode === 'zwiazek' && T.pair.head === u.id);
       if(T.labeled.has(u.id) && u.tag !== 'x'){
         el.dataset.t = u.tag;
         if(u.toks[0] === i) el.dataset.lab = TAGS[u.tag].lab; else delete el.dataset.lab;
@@ -1016,6 +1225,11 @@ function updateSentence(){
       const v = T.truth ? it.words[i].clause : (T.paint[i] || 0);
       [1, 2, 3].forEach(c => el.classList.toggle('pc' + c, v === c));
       el.classList.toggle('miss', T.truth && T.wrongW.has(i));
+    }
+    if(T.mode === 'przec' && T.phase === 'review'){
+      const gap = $('#gap');
+      gap.textContent = T.gap.comma ? ',' : '∅';
+      gap.className = 'gap ' + (T.gap.comma ? 'yes' : 'no');
     }
   });
 }
@@ -1028,7 +1242,8 @@ function start(){
   const pk = pickKey();
   lastKey = pk.key;
   T = makeTask(pk);
-  $('#kind').textContent = {parse:'Części zdania', rown:'Zdanie czy równoważnik?', zloz:'Budowa zdania'}[T.mode];
+  $('#kind').textContent = {parse:'Części zdania', rown:'Zdanie czy równoważnik?', zloz:'Budowa zdania',
+    cel:'Cel wypowiedzi', dopok:'Wyrażenie przyimkowe', zwiazek:'Związki wyrazowe', przec:'Interpunkcja'}[T.mode];
   $('#retNote').hidden = !T.repeat;
   feedback('');
   renderSentence();
@@ -1048,7 +1263,8 @@ function render(){
   renderSteps();
   if(T.mode === 'parse') renderParse();
   else if(T.mode === 'rown') renderRown();
-  else renderZloz();
+  else if(T.mode === 'zloz') renderZloz();
+  else renderQuiz();
   updateSentence();
 }
 
@@ -1057,7 +1273,7 @@ function renderParse(){
   const cur = STEPS[T.step];
   if(T.phase === 'done'){
     const okN = T.results.filter(Boolean).length;
-    setPrompt('Zdanie rozebrane',
+    setPrompt('Zdanie <b>rozebrane</b>', '',
       `${okN} z ${STEPS.length} kroków bez błędu.` + (T.failed ? ' To zdanie wróci za kilka przykładów.' : ''));
     setActions([{label:'Następne zdanie', primary:true, key:'Enter', onClick:start}]);
     return;
@@ -1109,13 +1325,13 @@ function advanceParse(){
 /* ---------- równoważnik ---------- */
 function renderRown(){
   if(T.phase === 'ask'){
-    setPrompt('Zdanie czy równoważnik zdania?', 'Zdanie ma orzeczenie (osobową formę czasownika). Równoważnik go nie ma.');
+    setPrompt('<b>Zdanie</b> czy <b>równoważnik zdania</b>?', 'Zdanie ma orzeczenie (osobową formę czasownika). Równoważnik go nie ma.');
     setActions([
       {label:'Zdanie', choice:true, key:'1', onClick:() => answerRown(false)},
       {label:'Równoważnik zdania', choice:true, key:'2', onClick:() => answerRown(true)},
     ]);
   } else {
-    setPrompt(T.isR ? 'To równoważnik zdania' : 'To zdanie', '');
+    setPrompt(T.isR ? 'To <b>równoważnik zdania</b>' : 'To <b>zdanie</b>', '');
     setActions([{label:'Dalej', primary:true, key:'Enter', onClick:start}]);
   }
 }
@@ -1140,24 +1356,27 @@ function answerRown(saysR){
 function renderZloz(){
   const it = T.item;
   if(T.phase === 'ask'){
-    setPrompt('Zdanie pojedyncze czy złożone?', 'Policz orzeczenia: każde zdanie składowe ma własne.');
+    setPrompt('Zdanie <b>pojedyncze</b> czy <b>złożone</b>?', 'Policz orzeczenia: każde zdanie składowe ma własne.');
     setActions([
       {label:'Pojedyncze', choice:true, key:'1', onClick:() => answerZ(false)},
       {label:'Złożone', choice:true, key:'2', onClick:() => answerZ(true)},
     ]);
   } else if(T.phase === 'paint'){
-    setPrompt('Pomaluj zdania składowe', 'Wybierz kolor i klikaj lub przeciągaj po wyrazach. Każde zdanie składowe ma własne orzeczenie. Spójników nie musisz malować.');
+    setPrompt('Pomaluj <b>zdania składowe</b>', 'Wybierz kolor i klikaj lub przeciągaj po wyrazach. Każde zdanie składowe ma własne orzeczenie. Spójników nie musisz malować.');
     setActions([{label:'Sprawdź podział', primary:true, key:'Enter', id:'checkBtn', disabled:!T.paint.some(Boolean), onClick:checkPaint}]);
   } else if(T.phase === 'type'){
-    setPrompt('Współrzędnie czy podrzędnie złożone?', 'Podrzędne odpowiada na pytanie zadane od zdania nadrzędnego. Współrzędne są równorzędne.');
+    setPrompt('<b>Współrzędnie</b> czy <b>podrzędnie</b> złożone?', 'Podrzędne odpowiada na pytanie zadane od zdania nadrzędnego. Współrzędne są równorzędne.');
     setActions([
       {label:'Współrzędnie', choice:true, key:'1', onClick:() => answerType('W')},
       {label:'Podrzędnie', choice:true, key:'2', onClick:() => answerType('P')},
     ]);
+  } else if(T.phase === 'sub'){
+    setPrompt('Jakie to zdanie <b>współrzędnie złożone</b>?', 'Zastanów się, jaka relacja łączy treści zdań składowych.');
+    setActions(Object.entries(SUBS).map(([k, v], i) => ({label:v.name, choice:true, key:String(i + 1), onClick:() => answerSub(k)})));
   } else {
-    const name = !T.isZ ? 'To zdanie pojedyncze'
-      : it.type === 'W' ? 'Zdanie złożone współrzędnie' : it.type === 'P' ? 'Zdanie złożone podrzędnie' : 'Zdanie wielokrotnie złożone';
-    setPrompt(name, T.failed ? 'To zdanie wróci za kilka przykładów.' : '');
+    const name = !T.isZ ? 'To zdanie <b>pojedyncze</b>'
+      : it.type === 'W' ? 'Zdanie złożone <b>współrzędnie' + (it.sub ? ' ' + SUBS[it.sub].name : '') + '</b>' : it.type === 'P' ? 'Zdanie złożone <b>podrzędnie</b>' : 'Zdanie <b>wielokrotnie złożone</b>';
+    setPrompt(name, '', T.failed ? 'To zdanie wróci za kilka przykładów.' : '');
     setActions([{label:'Dalej', primary:true, key:'Enter', onClick:start}]);
   }
 }
@@ -1207,10 +1426,111 @@ function answerType(t){
     ? 'Zdania składowe są równorzędne — żadne nie dopowiada drugiego.'
     : 'Zdanie podrzędne odpowiada na pytanie postawione od zdania nadrzędnego.';
   feedback((ok ? good('Dobrze!') : bad('Nie tym razem.')) + `<span>${why}</span>`);
-  T.phase = 'review';
   T.wrongW.clear();
+  if(it.type === 'W' && it.sub){
+    T.stepDefs.push({label:'odmiana'});
+    T.step = 3; T.phase = 'sub';
+    render();
+    return;
+  }
+  T.phase = 'review';
   buildClauses(it);
   $('#graphSub').textContent = it.type === 'P' ? 'strzałka biegnie od zdania nadrzędnego do podrzędnego' : 'zdania składowe połączone spójnikami';
+  render();
+}
+
+const SUBS = {
+  l:{name:'łączne', def:'Treści zdań składowych łączą się — czynności dzieją się niezależnie, w tym samym czasie lub miejscu. Spójniki: i, oraz.'},
+  r:{name:'rozłączne', def:'Treści zdań składowych wzajemnie się wykluczają. Spójniki: albo, lub, bądź, czy.'},
+  p:{name:'przeciwstawne', def:'Treści zdań składowych wykazują przeciwieństwo. Spójniki: ale, lecz, jednak, natomiast, zaś, a.'},
+  w:{name:'wynikowe', def:'Treść drugiego zdania wynika z pierwszego. Spójniki: więc, toteż, dlatego, zatem.'},
+};
+function answerSub(k){
+  const it = T.item, ok = k === it.sub;
+  award(ok, 'wsp');
+  feedback((ok ? good('Dobrze!') : bad(`Nie tym razem — to zdanie ${SUBS[it.sub].name}.`)) + `<span>${SUBS[it.sub].def}</span>`);
+  T.phase = 'review';
+  buildClauses(it);
+  $('#graphSub').textContent = 'strzałki jak w podręczniku: ' + SUBS[it.sub].name;
+  render();
+}
+
+/* ---------- szybkie pytania ---------- */
+const chipN = text => `<span class="tchip" style="--tc:var(--muted)">${esc(text)}</span>`;
+function showFullTree(){
+  T.labeled = new Set(T.item.units.filter(u => u.tag !== 'x').map(u => u.id));
+  buildTree(T.item); revealTree(T.labeled);
+  $('#graphSub').textContent = 'pełny rozbiór tego zdania';
+}
+const ZW_NAMES = {Z:'zgody', R:'rządu', P:'przynależności'};
+const QUIZ = {
+  cel:{
+    cat:'cel', prompt:'Jakie to wypowiedzenie ze względu na <b>cel wypowiedzi</b>?', hint:() => 'Czy autor informuje, pyta, czy wydaje polecenie?',
+    choices:[['O', 'oznajmujące'], ['P', 'pytające'], ['R', 'rozkazujące']],
+    answer:() => T.item.cel,
+    title:() => 'Wypowiedzenie <b>' + {O:'oznajmujące', P:'pytające', R:'rozkazujące'}[T.item.cel] + '</b>',
+    explain:() => ({O:'Autor przekazuje informację.', P:'Autor zadaje pytanie i oczekuje odpowiedzi.', R:'Autor wydaje polecenie, prosi, zachęca lub zakazuje.'})[T.item.cel],
+  },
+  dopok:{
+    cat:'dopok', prompt:'Wyróżnione wyrażenie przyimkowe to <b>dopełnienie</b> czy <b>okolicznik</b>?',
+    hint:() => 'Zadaj pytanie od orzeczenia. Pytanie przypadka (do kogo? o czym? na co?) wskazuje dopełnienie, pytanie o okoliczności (gdzie? dokąd? kiedy? jak? po co?) — okolicznik.',
+    choices:[['d', 'dopełnienie'], ['k', 'okolicznik']],
+    answer:() => T.target.tag,
+    title:() => 'To <b>' + TAGS[T.target.tag].name + '</b>',
+    explain:() => {
+      const u = T.item.units[T.target.u], o = T.item.oUnit.text;
+      return T.target.tag === 'd'
+        ? `„${esc(o)} ${esc(u.text)}” — pytamy o osobę lub rzecz w przypadku zależnym, więc to dopełnienie.`
+        : `„${esc(o)} ${esc(u.text)}” — pytamy o okoliczności (gdzie? kiedy? jak? w jakim celu?), więc to okolicznik.`;
+    },
+    after:showFullTree,
+  },
+  zwiazek:{
+    cat:'zwiazek', prompt:'Jaki <b>związek wyrazowy</b> tworzą wyróżnione wyrazy?',
+    hint:() => 'Zgody: wyrazy zgadzają się formą. Rządu: nadrzędny narzuca przypadek. Przynależności: podrzędny (okolicznik) nie zmienia formy.',
+    info:() => `nadrzędny ${chipN(T.item.units[T.pair.head].text)} → podrzędny ${chipN(T.item.units[T.pair.dep].text)}`,
+    choices:[['Z', 'zgody'], ['R', 'rządu'], ['P', 'przynależności']],
+    answer:() => T.pair.type,
+    title:() => 'Związek <b>' + ZW_NAMES[T.pair.type] + '</b>',
+    explain:() => ({
+      Z:'Wyraz podrzędny dostosowuje swoją formę (liczbę, rodzaj, przypadek) do nadrzędnego — zmienisz jeden, zmienia się drugi.',
+      R:'Wyraz nadrzędny narzuca podrzędnemu przypadek, niezależnie od własnej formy.',
+      P:'Wyraz podrzędny to okolicznik — nie zmienia formy razem z nadrzędnym i łączy się z nim tylko znaczeniem.',
+    })[T.pair.type],
+    after:showFullTree,
+  },
+  przec:{
+    cat:'przec', prompt:'Czy w miejscu „?” potrzebny jest <b>przecinek</b>?', hint:() => 'Spójrz na spójnik, który łączy zdania składowe.',
+    choices:[[true, 'Tak, przecinek'], [false, 'Bez przecinka']],
+    answer:() => T.gap.comma,
+    title:() => T.gap.comma ? '<b>Potrzebny</b> przecinek' : '<b>Bez</b> przecinka',
+    explain:() => {
+      const ws = T.item.words, g = T.gap.gap, conj = ws[g].text.toLowerCase();
+      const repeated = ws.slice(0, g).some(w => w.clause === 0 && w.text.toLowerCase() === conj);
+      const sub = T.item.sub ? ` To zdanie współrzędnie złożone ${SUBS[T.item.sub].name}.` : '';
+      if(T.gap.comma && repeated && !COMMA_YES.has(conj)) return `Spójnik „${esc(conj)}” został powtórzony w tej samej funkcji, więc przed powtórzeniem stawiamy przecinek.` + sub;
+      if(T.gap.comma) return `Przed spójnikiem „${esc(conj)}” stawiamy przecinek (tak jak przed: a, ale, lecz, więc, dlatego, natomiast, jednak).` + sub;
+      return `Przed spójnikiem „${esc(conj)}” nie stawiamy przecinka (tak jak przed: i, oraz, albo, lub, czy, bądź, ani).` + sub;
+    },
+    after:() => { T.truth = true; buildClauses(T.item); $('#graphSub').textContent = 'zdania składowe'; },
+  },
+};
+function renderQuiz(){
+  const q = QUIZ[T.mode];
+  if(T.phase === 'ask'){
+    setPrompt(q.prompt, q.hint(), q.info ? q.info() : '');
+    setActions(q.choices.map(([v, l], i) => ({label:l, choice:true, key:String(i + 1), onClick:() => answerQuiz(v)})));
+  } else {
+    setPrompt(q.title(), '', T.failed ? 'To zadanie wróci za kilka przykładów.' : '');
+    setActions([{label:'Dalej', primary:true, key:'Enter', onClick:start}]);
+  }
+}
+function answerQuiz(v){
+  const q = QUIZ[T.mode], ok = v === q.answer();
+  award(ok, q.cat);
+  T.phase = 'review';
+  feedback((ok ? good('Dobrze!') : bad('Nie tym razem.')) + `<span>${q.explain()}</span>`);
+  if(q.after) q.after();
   render();
 }
 
@@ -1264,12 +1584,12 @@ document.addEventListener('keydown', e => {
   if(T && T.phase === 'paint' && ['1', '2', '3'].includes(e.key)) setBrush(+e.key);
 });
 
-['parse', 'rown', 'zloz'].forEach(m => {
+Object.keys(MODES).forEach(m => {
   const cb = $('#mode-' + m);
   cb.checked = !!S.modes[m];
   cb.addEventListener('change', () => {
     S.modes[m] = cb.checked;
-    if(!S.modes.parse && !S.modes.rown && !S.modes.zloz){ S.modes.parse = true; $('#mode-parse').checked = true; }
+    if(!Object.keys(MODES).some(k => S.modes[k])){ S.modes.parse = true; $('#mode-parse').checked = true; }
     save();
     if(T && !S.modes[T.mode] && (T.phase === 'ask' || T.phase === 'select') && !T.results.length) start();
   });
