@@ -91,7 +91,7 @@ button{font:inherit; color:inherit}
 .w[data-t="d"]{--tc:var(--c-d); text-decoration-style:dashed}
 .w[data-t="k"]{--tc:var(--c-k); text-decoration-style:dotted; text-decoration-thickness:3px}
 .w[data-t="a"]{--tc:var(--c-a); text-decoration-style:wavy; text-decoration-thickness:1.5px}
-.w[data-lab]::after{content:attr(data-lab); position:absolute; left:50%; top:calc(100% - .55em); transform:translateX(-50%);
+.w[data-lab]::after{content:attr(data-lab); position:absolute; left:50%; top:calc(100% + .08em); transform:translateX(-50%);
   font:700 .34em/1 var(--f-ui); letter-spacing:.07em; text-transform:uppercase; color:var(--tc); white-space:nowrap; pointer-events:none}
 .w.miss{text-decoration:line-through 2.5px var(--bad); color:var(--bad); animation:shake .35s}
 @keyframes shake{25%{transform:translateX(-3px)}75%{transform:translateX(3px)}}
@@ -143,6 +143,19 @@ h3{margin:0; font:600 1.1rem var(--f-text)}
 .cl-1{--tc:var(--p1b)} .cl-2{--tc:var(--p2b)} .cl-3{--tc:var(--p3b)}
 .cl-1 rect{fill:var(--p1)} .cl-2 rect{fill:var(--p2)} .cl-3 rect{fill:var(--p3)}
 .edge{fill:none; stroke:var(--muted); stroke-width:1.5}
+.edge.good{stroke:var(--good); stroke-width:2.2}
+.arrowhead-good{fill:var(--good)}
+.edge.missed{stroke-dasharray:5 4}
+.link.good line{stroke:var(--good); stroke-width:2}
+.link.missed line{stroke-dasharray:5 4; stroke:var(--muted)}
+.drawing .node{cursor:pointer; touch-action:none}
+.drawing .node:hover rect{stroke-width:2.6}
+.node.implied rect{stroke-dasharray:5 4}
+.node.pick rect{stroke-width:3; fill:var(--selbg)}
+.conn{cursor:pointer}
+.conn .hit{fill:none; stroke:transparent; stroke-width:14}
+.conn:hover .edge, .conn:hover line{stroke-dasharray:3 3}
+.temp{stroke:var(--ink); stroke-width:1.5; stroke-dasharray:4 3; pointer-events:none}
 .arrowhead{fill:var(--muted)}
 .link line{stroke:var(--ink); stroke-width:1.4}
 .link.dash line{stroke-dasharray:5 4; stroke:var(--muted)}
@@ -231,6 +244,7 @@ h3{margin:0; font:600 1.1rem var(--f-text)}
         <label><input type="checkbox" id="mode-rown" checked> równoważniki</label>
         <label><input type="checkbox" id="mode-zloz" checked> zdania złożone</label>
         <label><input type="checkbox" id="mode-przec" checked> przecinki</label>
+        <label><input type="checkbox" id="mode-wykres" checked> rysowanie wykresu</label>
         <label><input type="checkbox" id="mode-podmiot" checked> rodzaj podmiotu</label>
         <label><input type="checkbox" id="mode-cel" checked> cel wypowiedzi</label>
         <label><input type="checkbox" id="mode-dopok" checked> dopełnienie czy okolicznik</label>
@@ -531,6 +545,16 @@ Ubywa/o wody/L w_studni/k.
 Na_drzewach/k nie_ma/o już/k liści/L.
 Na_niebie/k nie_było/o ani_jednej/a+ chmurki/L.
 Po_burzy/k przybyło/o wody/L w_rzece/k.
+Brakowało/o dowodów/L potwierdzających/a- jego/a+ stanowisko/d-2.
+Naukowiec/s podjął/o trudną/a+ decyzję/d.
+Zamknął_się/o w_pracowni/k na/k:m długie/a+ miesiące/k:m.
+Opracował/o projekt/d.
+Dziecku/C jest_zimno/o.
+Babci/C było_smutno/o.
+Tomkowi/C zrobiło_się_słabo/o.
+Chłopcu/C było_wstyd/o.
+Mnie/C jest_wesoło/o.
+Kasi/C było_przykro/o.
 ~Wczoraj/k cały/a+ dzień/k lało/o.
 ~Latem/k wcześnie/k świta/o.
 ~Pod_wieczór/k ochłodziło_się/o.
@@ -801,7 +825,7 @@ const TAGS = {
      q:'Co robi? Co się z nim dzieje? W jakim jest stanie? Razem z nim zaznacz „nie”, „się” i łącznik („jest”, „był”…).'},
   s:{name:'podmiot', lab:'podmiot', short:'podmiot', prompt:'Zaznacz <b>podmiot</b>', none:'Brak podmiotu – podmiot domyślny',
      none2:'Brak podmiotu – zdanie bezpodmiotowe',
-     q:'Kto? Co? Wykonawca czynności — zwykle w mianowniku (gramatyczny), czasem w dopełniaczu (logiczny: „Zabrakło chleba”). Jeśli go nie ma: podmiot domyślny („Idę do szkoły”) albo zdanie bezpodmiotowe („Grzmi”).'},
+     q:'Kto? Co? Wykonawca czynności — zwykle w mianowniku (gramatyczny), czasem w dopełniaczu lub celowniku (logiczny: „Zabrakło chleba”, „Dziecku jest zimno”). Jeśli go nie ma: podmiot domyślny („Idę do szkoły”) albo zdanie bezpodmiotowe („Grzmi”).'},
   d:{name:'dopełnienie', lab:'dopełn.', short:'dopełn.', prompt:'Zaznacz wszystkie <b>dopełnienia</b>', none:'Brak dopełnień',
      q:'Kogo? Czego? Komu? Czemu? Kogo? Co? Kim? Czym? O kim? O czym? Uzupełnia czasownik.'},
   k:{name:'okolicznik', lab:'okol.', short:'okol.', prompt:'Zaznacz wszystkie <b>okoliczniki</b>', none:'Brak okoliczników',
@@ -812,15 +836,29 @@ const TAGS = {
 const STEPS = ['o','s','d','k','a'];
 const PUNCT = /([.,!?;:…]*)$/;
 
+/* podmiot domyślny na wykresie zapisujemy w nawiasie — zgadujemy zaimek z końcówki orzeczenia */
+function guessPronoun(o){
+  const w = o.toLowerCase().split(' ').filter(x => x !== 'nie' && x !== 'się')[0] || '';
+  if(/(my)$/.test(w)) return 'my';
+  if(/(cie)$/.test(w)) return 'wy';
+  if(/(łeś|łaś|sz)$/.test(w)) return 'ty';
+  if(/(łem|łam|ę|em|am)$/.test(w)) return 'ja';
+  if(/(j|ij|dź|ń|yj)$/.test(w)) return 'ty';
+  if(/ła$/.test(w)) return 'ona';
+  if(/ło$/.test(w)) return 'ono';
+  if(/li$/.test(w)) return 'oni';
+  if(/ły$/.test(w)) return 'one';
+  return 'on';
+}
 function parseSimple(line, idx){
   let trap = false, bezp = false;
   while(/^[*~]/.test(line)){ if(line[0] === '*') trap = true; else bezp = true; line = line.slice(1); }
-  const R = /^(.+?)\/([sodkaxL])(?::([A-Za-z0-9]+))?(?:([+-]\d*)|>([A-Za-z0-9]+))?([.,!?;:…]*)$/;
+  const R = /^(.+?)\/([sodkaxLC])(?::([A-Za-z0-9]+))?(?:([+-]\d*)|>([A-Za-z0-9]+))?([.,!?;:…]*)$/;
   const toks = [], units = [], byG = {};
   line.trim().split(/\s+/).forEach((raw, i) => {
     const m = raw.match(R);
     if(!m) throw new Error(`zdanie ${idx}: nie rozumiem „${raw}”`);
-    const logical = m[2] === 'L';
+    const logical = m[2] === 'L' || m[2] === 'C' ? (m[2] === 'L' ? 'dopełniaczu' : 'celowniku') : false;
     const tok = {i, text:m[1].replace(/_/g,' '), punct:m[6]||'', tag:logical ? 's' : m[2]};
     let u;
     if(m[3] && byG[m[3]]){
@@ -860,7 +898,8 @@ function parseSimple(line, idx){
   const subs = units.filter(u => u.tag === 's');
   if(bezp && subs.length) throw new Error(`zdanie ${idx}: bezpodmiotowe z podmiotem`);
   const subj = subs.length ? (subs[0].logical ? 'logiczny' : 'gramatyczny') : (bezp ? 'bezpodmiotowe' : 'domyślny');
-  return {kind:'parse', toks, units, trap, subj, oUnit:os[0]};
+  const implied = subj === 'domyślny' ? guessPronoun(os[0].text) : null;
+  return {kind:'parse', toks, units, trap, subj, implied, oUnit:os[0]};
 }
 
 function splitPlain(line){
@@ -957,10 +996,13 @@ function textW(text, font){
 }
 const FONT_NT = '600 15px "Atkinson Hyperlegible", system-ui, sans-serif';
 const FONT_NL = '700 9.5px "Atkinson Hyperlegible", system-ui, sans-serif';
+const nodeW = u => Math.ceil(Math.max(textW(u.text, FONT_NT), textW((u.id === 'imp' ? 'podmiot domyślny' : TAGS[u.tag].name).toUpperCase(), FONT_NL) * 1.12)) + 28;
 function addArrowDef(svg){
   const defs = svgEl('defs', {}, svg);
   const mk = svgEl('marker', {id:'arr', viewBox:'0 0 10 10', refX:'9', refY:'5', markerWidth:'7', markerHeight:'7', orient:'auto-start-reverse'}, defs);
   svgEl('path', {d:'M0,0 L10,5 L0,10 z', class:'arrowhead'}, mk);
+  const mg = svgEl('marker', {id:'arrGood', viewBox:'0 0 10 10', refX:'9', refY:'5', markerWidth:'7', markerHeight:'7', orient:'auto-start-reverse'}, defs);
+  svgEl('path', {d:'M0,0 L10,5 L0,10 z', class:'arrowhead-good'}, mg);
 }
 function drawNode(svg, cls, x, y, w, h, main, label, id){
   const g = svgEl('g', {class:`node ${cls}`, transform:`translate(${x - w/2},${y})`, 'data-u':id}, svg);
@@ -974,12 +1016,13 @@ function buildTree(item){
   const box = document.getElementById('graphbox');
   box.innerHTML = '';
   const nodes = item.units.filter(u => u.tag !== 'x');
+  if(item.implied) nodes.unshift(impliedNode(item));
   const top = [...nodes.filter(u => u.tag === 's'), ...nodes.filter(u => u.tag === 'o')];
   const kids = new Map(nodes.map(u => [u.id, []]));
   nodes.forEach(u => { if(u.tag !== 's' && u.tag !== 'o' && kids.has(u.head)) kids.get(u.head).push(u); });
   const H = 48, VG = 58, HG = 14, TG = 54, PAD = 16;
   const W = {}, SW = {}, pos = {};
-  nodes.forEach(u => W[u.id] = Math.ceil(Math.max(textW(u.text, FONT_NT), textW(TAGS[u.tag].name.toUpperCase(), FONT_NL) * 1.12)) + 28);
+  nodes.forEach(u => W[u.id] = nodeW(u));
   const cw = ch => ch.reduce((s, c) => s + SW[c.id], 0) + HG * Math.max(0, ch.length - 1);
   const sw = u => { kids.get(u.id).forEach(sw); return SW[u.id] = Math.max(W[u.id], cw(kids.get(u.id))); };
   let maxD = 0;
@@ -1008,14 +1051,21 @@ function buildTree(item){
     if(a.tag === b.tag) svgEl('line', {x1, y1:y, x2, y2:y}, g);
     else { svgEl('line', {x1, y1:y-3, x2, y2:y-3}, g); svgEl('line', {x1, y1:y+3, x2, y2:y+3}, g); }
   }
-  nodes.forEach(u => drawNode(svg, 't-' + u.tag, pos[u.id].x, pos[u.id].y, W[u.id], H, u.text, TAGS[u.tag].name, u.id));
+  nodes.forEach(u => drawNode(svg, 't-' + u.tag + (u.id === 'imp' ? ' implied' : ''), pos[u.id].x, pos[u.id].y, W[u.id], H, u.text, u.id === 'imp' ? 'podmiot domyślny' : TAGS[u.tag].name, u.id));
   return svg;
 }
+const nodeKey = v => v === 'imp' ? v : +v;
+function allShown(it){
+  const set = new Set(it.units.filter(u => u.tag !== 'x').map(u => u.id));
+  if(it.implied) set.add('imp');
+  return set;
+}
+function impliedNode(it){ return {id:'imp', tag:'s', text:`(${it.implied})`}; }
 function revealTree(shown){
   const svg = document.querySelector('#graphbox svg');
   if(!svg) return;
-  svg.querySelectorAll('.node').forEach(n => n.classList.toggle('on', shown.has(+n.dataset.u)));
-  svg.querySelectorAll('.edge,.link').forEach(e => e.classList.toggle('on', shown.has(+e.dataset.a) && shown.has(+e.dataset.b)));
+  svg.querySelectorAll('.node').forEach(n => n.classList.toggle('on', shown.has(nodeKey(n.dataset.u))));
+  svg.querySelectorAll('.edge,.link').forEach(e => e.classList.toggle('on', shown.has(nodeKey(e.dataset.a)) && shown.has(nodeKey(e.dataset.b))));
 }
 
 function buildClauses(item){
@@ -1081,8 +1131,8 @@ const esc = s => s.replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','
 const STORE = 'pajeczynka-zdania-v1';
 const CATS = [['o','Orzeczenie'],['s','Podmiot'],['d','Dopełnienie'],['k','Okolicznik'],['a','Przydawka'],
   ['rown','Zdanie czy równoważnik'],['zloz','Pojedyncze czy złożone'],['podzial','Zdania składowe'],['typ','Rodzaj złożenia'],
-  ['wsp','Rodzaj współrzędnego'],['przec','Przecinek przed spójnikiem'],['cel','Cel wypowiedzi'],['dopok','Dopełnienie czy okolicznik'],['zwiazek','Związki wyrazowe'],['ptyp','Rodzaj podmiotu']];
-const MODES = {parse:.34, podmiot:.08, dopok:.1, zwiazek:.1, rown:.1, cel:.08, zloz:.16, przec:.08};
+  ['wsp','Rodzaj współrzędnego'],['przec','Przecinek przed spójnikiem'],['cel','Cel wypowiedzi'],['dopok','Dopełnienie czy okolicznik'],['zwiazek','Związki wyrazowe'],['ptyp','Rodzaj podmiotu'],['wykres','Wykres zdania']];
+const MODES = {parse:.28, wykres:.08, podmiot:.08, dopok:.1, zwiazek:.1, rown:.1, cel:.08, zloz:.16, przec:.08};
 
 const S = {score:0, best:0, streak:0, stats:{}, modes:{}};
 try { Object.assign(S, JSON.parse(localStorage.getItem(STORE)) || {}); } catch(e) {}
@@ -1102,7 +1152,7 @@ function draw(name, size){
   return decks[name].pop();
 }
 const rnd = a => a[Math.floor(Math.random() * a.length)];
-const modeOf = key => ({p:'parse', r:'rown', rn:'rown', z:'zloz', zn:'zloz', c:'cel', do:'dopok', zw:'zwiazek', pr:'przec', pd:'podmiot'})[key.split(':')[0]];
+const modeOf = key => ({p:'parse', r:'rown', rn:'rown', z:'zloz', zn:'zloz', c:'cel', do:'dopok', zw:'zwiazek', pr:'przec', pd:'podmiot', wy:'wykres'})[key.split(':')[0]];
 
 function pickKey(){
   round++;
@@ -1117,6 +1167,7 @@ function pickKey(){
     if(mode === 'parse') key = 'p:' + draw('p', PARSED.length);
     else if(mode === 'rown') key = Math.random() < .55 ? 'r:' + draw('r', ROWN.length)
       : 'rn:' + (Math.random() < .5 ? rnd(TRAPS) : rnd(PARSED.map((_, i) => i)));
+    else if(mode === 'wykres') key = 'wy:' + rnd(WYK);
     else if(mode === 'podmiot') key = 'pd:' + rnd(SUBJ[rnd(Object.keys(SUBJ))]);
     else if(mode === 'cel') key = 'c:' + draw('c', CEL.length);
     else if(mode === 'dopok') key = 'do:' + draw('do', DOPOK.length);
@@ -1143,6 +1194,11 @@ function makeTask({key, repeat}){
     const it = ZLOZ[idx];
     return {...base, mode:'zloz', item:it, isZ:true, phase:'ask', paint:[], truth:false, wrongW:new Set(),
       stepDefs:[{label:'budowa'}, {label:'podział'}, ...(it.type !== 'M' ? [{label:'rodzaj'}] : [])]};
+  }
+  if(k === 'wy'){
+    const it = PARSED[idx];
+    return {...base, mode:'wykres', item:it, phase:'draw', par:{}, slink:{}, pick:null,
+      labeled:allShown(it), stepDefs:[{label:'wykres'}]};
   }
   if(k === 'pd') return {...base, mode:'podmiot', item:PARSED[idx], phase:'ask', stepDefs:[{label:'podmiot'}]};
   if(k === 'c') return {...base, mode:'cel', item:CEL[idx], phase:'ask', stepDefs:[{label:'cel'}]};
@@ -1283,7 +1339,7 @@ function start(){
   lastKey = pk.key;
   T = makeTask(pk);
   $('#kind').textContent = {parse:'Części zdania', rown:'Zdanie czy równoważnik?', zloz:'Budowa zdania',
-    podmiot:'Rodzaj podmiotu', cel:'Cel wypowiedzi', dopok:'Wyrażenie przyimkowe', zwiazek:'Związki wyrazowe', przec:'Interpunkcja'}[T.mode];
+    wykres:'Wykres zdania', podmiot:'Rodzaj podmiotu', cel:'Cel wypowiedzi', dopok:'Wyrażenie przyimkowe', zwiazek:'Związki wyrazowe', przec:'Interpunkcja'}[T.mode];
   $('#retNote').hidden = !T.repeat;
   feedback('');
   renderSentence();
@@ -1291,6 +1347,8 @@ function start(){
     buildTree(T.item);
     revealTree(T.labeled);
     $('#graphSub').textContent = 'rośnie z każdą rozpoznaną częścią zdania';
+  } else if(T.mode === 'wykres'){
+    drawUserGraph();
   } else if(T.mode === 'rown'){
     graphEmpty('Odpowiedz, a zobaczysz wyjaśnienie.', '');
   } else {
@@ -1304,6 +1362,7 @@ function render(){
   if(T.mode === 'parse') renderParse();
   else if(T.mode === 'rown') renderRown();
   else if(T.mode === 'zloz') renderZloz();
+  else if(T.mode === 'wykres') renderWykres();
   else renderQuiz();
   updateSentence();
 }
@@ -1345,6 +1404,7 @@ function checkParse(none){
   if(cur === 's' && !correct.length && typeof none === 'string' && none !== it.subj) ok = false;
   const bonus = award(ok, cur);
   correct.forEach(id => T.labeled.add(id));
+  if(cur === 's' && it.implied) T.labeled.add('imp');
   const list = correct.map(id => chip(cur, it.units[id].text)).join(' ');
   const plural = {s:'podmiotu', d:'dopełnień', k:'okoliczników', a:'przydawek', o:'orzeczenia'}[cur];
   if(ok){
@@ -1359,7 +1419,7 @@ function checkParse(none){
     T.sel.clear();
     const noneMsg = cur === 's' ? SUBJ_WHY[it.subj](it) : `W tym zdaniu nie ma ${plural}.`;
     feedback(bad('Nie tym razem.') + (correct.length ? `<span>Poprawnie:</span> ${list}` : `<span>${noneMsg}</span>`)
-      + (cur === 's' && it.subj === 'logiczny' ? '<span>To podmiot logiczny (w dopełniaczu).</span>' : ''));
+      + (cur === 's' && it.subj === 'logiczny' ? `<span>To podmiot logiczny (w ${it.units.find(u => u.tag === 's').logical}).</span>` : ''));
     revealTree(T.labeled);
     T.phase = 'review';
     render();
@@ -1370,16 +1430,16 @@ function advanceParse(){
   T.miss.clear();
   T.step++;
   T.phase = T.step >= STEPS.length ? 'done' : 'select';
-  if(T.phase === 'done') T.item.units.forEach(u => u.tag !== 'x' && T.labeled.add(u.id));
+  if(T.phase === 'done') T.labeled = allShown(T.item);
   revealTree(T.labeled);
   render();
 }
 
-const PTYP_TIP = 'Gramatyczny stoi w mianowniku (kto? co?). Logiczny stoi w dopełniaczu (kogo? czego?) przy orzeczeniach typu: nie ma, nie było, zabrakło, przybyło, ubyło.';
+const PTYP_TIP = 'Gramatyczny stoi w mianowniku (kto? co?), np. „Naukowiec podjął trudną decyzję”. Logiczny stoi w dopełniaczu (kogo? czego?), a czasami w celowniku lub narzędniku, np. „Brakowało dowodów”, „Dziecku jest zimno”.';
 const SUBJ_WHY = {
   gramatyczny:it => `Podmiot gramatyczny „${esc(it.units.find(u => u.tag === 's').text)}” stoi w mianowniku.`,
-  logiczny:it => `Podmiot logiczny „${esc(it.units.find(u => u.tag === 's').text)}” stoi w dopełniaczu.`,
-  'domyślny':it => `Podmiotu nie ma w zdaniu, ale domyślamy się go z formy orzeczenia „${esc(it.oUnit.text)}” — to podmiot domyślny.`,
+  logiczny:it => { const u = it.units.find(v => v.tag === 's'); return `Podmiot logiczny „${esc(u.text)}” nie stoi w mianowniku, tylko w ${u.logical}.`; },
+  'domyślny':it => `Podmiotu nie ma w zdaniu, ale domyślamy się go z formy orzeczenia „${esc(it.oUnit.text)}” — to podmiot domyślny. Na wykresie zapisujemy go w nawiasie: (${it.implied}).`,
   bezpodmiotowe:it => `Orzeczenie „${esc(it.oUnit.text)}” nie wskazuje żadnego wykonawcy — to zdanie bezpodmiotowe.`,
 };
 function answerStype(v){
@@ -1411,7 +1471,7 @@ function answerRown(saysR){
     feedback((ok ? good('Dobrze!') : bad('Nie tym razem.')) + '<span>Nie ma tu osobowej formy czasownika, więc nie ma orzeczenia.</span>');
     graphEmpty('Równoważnik zdania nie ma orzeczenia, więc nie ma wokół czego budować wykresu.', '');
   } else {
-    T.labeled = new Set(T.item.units.filter(u => u.tag !== 'x').map(u => u.id));
+    T.labeled = allShown(T.item);
     feedback((ok ? good('Dobrze!') : bad('Nie tym razem.')) + `<span>Ma orzeczenie:</span> ${chip('o', T.item.oUnit.text)}`);
     buildTree(T.item); revealTree(T.labeled);
     $('#graphSub').textContent = 'pełny rozbiór tego zdania';
@@ -1453,7 +1513,7 @@ function answerZ(saysZ){
   award(ok, 'zloz');
   const head = ok ? good('Dobrze!') : bad('Nie tym razem.');
   if(!T.isZ){
-    T.labeled = new Set(T.item.units.filter(u => u.tag !== 'x').map(u => u.id));
+    T.labeled = allShown(T.item);
     feedback(head + `<span>Jest tylko jedno orzeczenie:</span> ${chip('o', T.item.oUnit.text)}`);
     buildTree(T.item); revealTree(T.labeled);
     $('#graphSub').textContent = 'pełny rozbiór tego zdania';
@@ -1526,7 +1586,7 @@ function answerSub(k){
 /* ---------- szybkie pytania ---------- */
 const chipN = text => `<span class="tchip" style="--tc:var(--muted)">${esc(text)}</span>`;
 function showFullTree(){
-  T.labeled = new Set(T.item.units.filter(u => u.tag !== 'x').map(u => u.id));
+  T.labeled = allShown(T.item);
   buildTree(T.item); revealTree(T.labeled);
   $('#graphSub').textContent = 'pełny rozbiór tego zdania';
 }
@@ -1611,6 +1671,201 @@ function answerQuiz(v){
   render();
 }
 
+/* ---------- rysowanie wykresu ---------- */
+const WYK = PARSED.map((p, i) => {
+  const n = p.units.filter(u => u.tag !== 'x').length;
+  return n >= 3 && n <= 9 ? i : -1;
+}).filter(i => i >= 0);
+let drag = null;
+
+function renderWykres(){
+  if(T.phase === 'draw'){
+    setPrompt('Narysuj <b>wykres zdania</b>',
+      'Przeciągnij od wyrazu nadrzędnego do podrzędnego (albo kliknij najpierw nadrzędny, potem podrzędny). Podmiot połącz z orzeczeniem. Kliknij połączenie, żeby je usunąć. Jeśli wyraz ma już nadrzędnik, nowe połączenie go zastąpi.',
+      'Rysuj w polu „Wykres zdania” poniżej.');
+    const any = Object.keys(T.par).length || Object.keys(T.slink).length;
+    setActions([
+      {label:'Sprawdź wykres', primary:true, key:'Enter', id:'checkBtn', disabled:!any, onClick:checkWykres},
+      {label:'Wyczyść', disabled:!any, onClick:() => { T.par = {}; T.slink = {}; T.pick = null; drawUserGraph(); render(); }},
+    ]);
+  } else {
+    setPrompt(T.results[0] ? 'Wykres <b>poprawny</b>' : 'Poprawny <b>wykres</b>', '', T.failed ? 'To zdanie wróci za kilka przykładów.' : '');
+    setActions([{label:'Dalej', primary:true, key:'Enter', onClick:start}]);
+  }
+}
+
+function drawUserGraph(){
+  const it = T.item, box = $('#graphbox');
+  box.innerHTML = '';
+  const nodes = it.units.filter(u => u.tag !== 'x');
+  const H = 48, VG = 58, HG = 14, TG = 40, PAD = 16;
+  const W = {}, SW = {}, pos = {};
+  nodes.forEach(u => W[u.id] = nodeW(u));
+  const kids = new Map(nodes.map(u => [u.id, []]));
+  nodes.forEach(u => { if(T.par[u.id] !== undefined) kids.get(T.par[u.id]).push(u); });
+  const first = u => u.toks[0];
+  kids.forEach(ch => ch.sort((a, b) => first(a) - first(b)));
+  const rootsRaw = nodes.filter(u => T.par[u.id] === undefined).sort((a, b) => first(a) - first(b));
+  const roots = [];
+  rootsRaw.forEach(u => {
+    if(u.tag === 's' && T.slink[u.id] !== undefined && rootsRaw.some(v => v.id === T.slink[u.id])) return;
+    rootsRaw.filter(v => v.tag === 's' && T.slink[v.id] === u.id).forEach(v => roots.push(v));
+    roots.push(u);
+  });
+  const cw = ch => ch.reduce((s, c) => s + SW[c.id], 0) + HG * Math.max(0, ch.length - 1);
+  const sw = u => { kids.get(u.id).forEach(sw); return SW[u.id] = Math.max(W[u.id], cw(kids.get(u.id))); };
+  let maxD = 0;
+  const place = (u, x0, d) => {
+    maxD = Math.max(maxD, d);
+    pos[u.id] = {x:x0 + SW[u.id]/2, y:PAD + d * (H + VG)};
+    let x = x0 + (SW[u.id] - cw(kids.get(u.id))) / 2;
+    kids.get(u.id).forEach(c => { place(c, x, d + 1); x += SW[c.id] + HG; });
+  };
+  let imp = null;
+  if(it.implied){
+    imp = impliedNode(it);
+    W.imp = nodeW(imp); kids.set('imp', []);
+    const oi = roots.findIndex(u => u.tag === 'o');
+    roots.splice(oi < 0 ? 0 : oi, 0, imp);
+  }
+  let x = PAD;
+  roots.forEach(u => { sw(u); place(u, x, 0); x += SW[u.id] + TG; });
+  const width = Math.ceil(x - TG + PAD), height = PAD * 2 + (maxD + 1) * H + maxD * VG;
+  const svg = svgEl('svg', {width, height, viewBox:`0 0 ${width} ${height}`, class:'drawing', role:'img', 'aria-label':'Twój wykres zdania'}, box);
+  addArrowDef(svg);
+  Object.entries(T.par).forEach(([c, h]) => {
+    const p = pos[h], q = pos[c], y1 = p.y + H, y2 = q.y - 1;
+    const d = y2 > y1
+      ? `M${p.x},${y1} C${p.x},${(y1 + y2)/2} ${q.x},${(y1 + y2)/2} ${q.x},${y2}`
+      : `M${p.x},${p.y + H/2} L${q.x},${q.y + H/2}`;
+    const g = svgEl('g', {class:'conn', 'data-c':c}, svg);
+    svgEl('path', {d, class:'edge on', 'marker-end':'url(#arr)'}, g);
+    svgEl('path', {d, class:'hit'}, g);
+  });
+  Object.entries(T.slink).forEach(([sId, oId]) => {
+    const a = pos[sId], b = pos[oId];
+    const ax = a.x < b.x ? a.x + W[sId]/2 : a.x - W[sId]/2, bx = a.x < b.x ? b.x - W[oId]/2 : b.x + W[oId]/2;
+    const ay = a.y + H/2, by = b.y + H/2;
+    const g = svgEl('g', {class:'conn link on', 'data-s':sId}, svg);
+    svgEl('line', {x1:ax, y1:ay - 3, x2:bx, y2:by - 3}, g);
+    svgEl('line', {x1:ax, y1:ay + 3, x2:bx, y2:by + 3}, g);
+    svgEl('path', {d:`M${ax},${ay} L${bx},${by}`, class:'hit'}, g);
+  });
+  if(imp){
+    const a = pos.imp, b = pos[it.oUnit.id], y = a.y + H/2;
+    if(b && b.y === a.y){
+      const g = svgEl('g', {class:'link on'}, svg);
+      svgEl('line', {x1:a.x + W.imp/2, y1:y - 3, x2:b.x - W[it.oUnit.id]/2, y2:y - 3}, g);
+      svgEl('line', {x1:a.x + W.imp/2, y1:y + 3, x2:b.x - W[it.oUnit.id]/2, y2:y + 3}, g);
+    }
+    drawNode(svg, 'on t-s implied', a.x, a.y, W.imp, H, imp.text, 'podmiot domyślny', 'imp');
+  }
+  nodes.forEach(u => {
+    const n = drawNode(svg, 'on t-' + u.tag + (T.pick === u.id ? ' pick' : ''), pos[u.id].x, pos[u.id].y, W[u.id], H, u.text, TAGS[u.tag].name, u.id);
+    n.dataset.cx = pos[u.id].x; n.dataset.cy = pos[u.id].y + H/2;
+  });
+  $('#graphSub').textContent = 'od wyrazu nadrzędnego do podrzędnego';
+}
+
+function connect(h, c){
+  const it = T.item, A = it.units[h], B = it.units[c];
+  T.pick = null;
+  if((A.tag === 's' && B.tag === 'o') || (A.tag === 'o' && B.tag === 's')){
+    const sId = A.tag === 's' ? h : c, oId = A.tag === 'o' ? h : c;
+    T.slink[sId] = oId;
+    delete T.par[sId];
+  } else {
+    for(let a = h, n = 0; a !== undefined && n < 30; a = T.par[a], n++){
+      if(a === c){ feedback(bad('Tak się nie da.') + '<span>To połączenie utworzyłoby pętlę.</span>'); drawUserGraph(); return; }
+    }
+    T.par[c] = h;
+    if(B.tag === 's') delete T.slink[c];
+  }
+  feedback('');
+  drawUserGraph();
+  render();
+}
+
+function checkWykres(){
+  const it = T.item, nodes = it.units.filter(u => u.tag !== 'x');
+  const deps = nodes.filter(u => u.tag !== 's' && u.tag !== 'o'), subs = nodes.filter(u => u.tag === 's');
+  const total = deps.length + subs.length;
+  const good_ = deps.filter(u => T.par[u.id] === u.head).length + subs.filter(u => T.slink[u.id] !== undefined).length;
+  const wrong = Object.entries(T.par).filter(([c, h]) => it.units[c].head !== h || it.units[c].tag === 's' || it.units[c].tag === 'o');
+  const ok = good_ === total && !wrong.length;
+  award(ok, 'wykres');
+  T.phase = 'review';
+  const wrongHtml = wrong.map(([c, h]) => `${chipN(it.units[h].text)} → ${chipN(it.units[c].text)}`).join(' ');
+  feedback((ok ? good('Dobrze!') + '<span>Wszystkie połączenia są poprawne.</span>'
+    : bad('Nie tym razem.') + `<span>Poprawnych połączeń: ${good_} z ${total}. Brakujące są przerywane.</span>`)
+    + (wrong.length ? `<span>Błędne:</span> ${wrongHtml}` : ''));
+  markWykres();
+  render();
+}
+
+function markWykres(){
+  buildTree(T.item);
+  revealTree(T.labeled);
+  const svg = $('#graphbox svg'), it = T.item;
+  svg.querySelectorAll('.edge').forEach(e => {
+    const ok = T.par[+e.dataset.b] === +e.dataset.a;
+    e.classList.add(ok ? 'good' : 'missed');
+    if(ok) e.setAttribute('marker-end', 'url(#arrGood)');
+  });
+  svg.querySelectorAll('.link').forEach(l => {
+    if(l.dataset.a === 'imp' || l.dataset.b === 'imp') return;
+    const A = it.units[+l.dataset.a], B = it.units[+l.dataset.b];
+    if(A.tag === B.tag) return;
+    const sId = A.tag === 's' ? A.id : B.id;
+    l.classList.add(T.slink[sId] !== undefined ? 'good' : 'missed');
+  });
+  $('#graphSub').textContent = 'zielone: narysowane dobrze · przerywane: brakujące';
+}
+
+function svgPoint(svg, e){
+  const pt = svg.createSVGPoint();
+  pt.x = e.clientX; pt.y = e.clientY;
+  return pt.matrixTransform(svg.getScreenCTM().inverse());
+}
+const graphEl = $('#graphbox');
+graphEl.addEventListener('pointerdown', e => {
+  if(!T || T.mode !== 'wykres' || T.phase !== 'draw') return;
+  const node = e.target.closest('.node');
+  if(!node || node.dataset.u === 'imp') return;
+  e.preventDefault();
+  const svg = node.ownerSVGElement;
+  drag = {from:+node.dataset.u, svg, moved:false, line:svgEl('line', {x1:node.dataset.cx, y1:node.dataset.cy, x2:node.dataset.cx, y2:node.dataset.cy, class:'temp'}, svg)};
+});
+window.addEventListener('pointermove', e => {
+  if(!drag) return;
+  const p = svgPoint(drag.svg, e);
+  drag.line.setAttribute('x2', p.x); drag.line.setAttribute('y2', p.y);
+  drag.moved = true;
+});
+window.addEventListener('pointerup', e => {
+  if(!drag) return;
+  const d = drag; drag = null;
+  d.line.remove();
+  const el = document.elementFromPoint(e.clientX, e.clientY);
+  const node = el && el.closest && el.closest('#graphbox .node');
+  const to = node && node.dataset.u !== 'imp' ? +node.dataset.u : null;
+  if(to !== null && to !== d.from){ connect(d.from, to); return; }
+  if(to === d.from){
+    if(T.pick !== null && T.pick !== to) connect(T.pick, to);
+    else { T.pick = T.pick === to ? null : to; drawUserGraph(); }
+  }
+});
+window.addEventListener('pointercancel', () => { if(drag){ drag.line.remove(); drag = null; } });
+graphEl.addEventListener('click', e => {
+  if(!T || T.mode !== 'wykres' || T.phase !== 'draw') return;
+  const conn = e.target.closest('.conn');
+  if(!conn) return;
+  if(conn.dataset.c !== undefined) delete T.par[conn.dataset.c];
+  if(conn.dataset.s !== undefined) delete T.slink[conn.dataset.s];
+  drawUserGraph();
+  render();
+});
+
 /* ---------- zdarzenia ---------- */
 function setBrush(b){
   brush = b;
@@ -1683,7 +1938,8 @@ renderStats();
 start();
 if(document.fonts && document.fonts.ready) document.fonts.ready.then(() => {
   if(!T) return;
-  if(T.mode === 'parse' || (T.item.kind === 'parse' && T.phase === 'review')){ buildTree(T.item); revealTree(T.labeled); }
+  if(T.mode === 'wykres'){ T.phase === 'draw' ? drawUserGraph() : markWykres(); }
+  else if(T.mode === 'parse' || (T.item.kind === 'parse' && T.phase === 'review')){ buildTree(T.item); revealTree(T.labeled); }
   else if(T.item.kind === 'z' && T.phase === 'review') buildClauses(T.item);
 });
 </script>
