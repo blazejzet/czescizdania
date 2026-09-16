@@ -231,6 +231,7 @@ h3{margin:0; font:600 1.1rem var(--f-text)}
         <label><input type="checkbox" id="mode-rown" checked> równoważniki</label>
         <label><input type="checkbox" id="mode-zloz" checked> zdania złożone</label>
         <label><input type="checkbox" id="mode-przec" checked> przecinki</label>
+        <label><input type="checkbox" id="mode-podmiot" checked> rodzaj podmiotu</label>
         <label><input type="checkbox" id="mode-cel" checked> cel wypowiedzi</label>
         <label><input type="checkbox" id="mode-dopok" checked> dopełnienie czy okolicznik</label>
         <label><input type="checkbox" id="mode-zwiazek" checked> związki wyrazowe</label>
@@ -425,8 +426,8 @@ Gołębie/s gruchają/o na_dachu/k.
 Uczeń/s odpowiadał/o bez_zająknięcia/k.
 Dzik/s ryje/o w_ziemi/k.
 Klaudia/s przeczytała/o już/k wszystkie/a+ lektury/d.
-W_nocy/k mocno/k padało/o.
-Wieczorem/k zagrzmiało/o.
+~W_nocy/k mocno/k padało/o.
+~Wieczorem/k zagrzmiało/o.
 Idę/o do_biblioteki/k po_książkę/k.
 Czytam/o ciekawą/a+ powieść/d.
 Pojechaliśmy/o w_góry/k.
@@ -436,7 +437,7 @@ Codziennie/k wstaję/o o_siódmej/k.
 Napiszę/o do_ciebie/d jutro/k.
 Byliśmy/o w_kinie/k.
 Dziękuję/o za_pomoc/d.
-Powoli/k świtało/o.
+~Powoli/k świtało/o.
 Zapomniałem/o parasola/d.
 Uczymy_się/o języka/d angielskiego/a-.
 Nie_lubię/o szpinaku/d.
@@ -494,8 +495,8 @@ Ptaki/s zbudowały/o gniazdo/d na_balkonie/k.
 Ogrodnik/s posadził/o w_ogrodzie/k żółte/a+ tulipany/d.
 Stary/a+ rybak/s naprawia/o sieci/d.
 Z_powodu/k:p choroby/k:p Ola/s została/o w_domu/k.
-*Pada/o!
-*Grzmi/o.
+*~Pada/o!
+*~Grzmi/o.
 *Chodź/o tu/k!
 *Uważaj/o!
 *Sklep/s jest_zamknięty/o.
@@ -504,11 +505,39 @@ Z_powodu/k:p choroby/k:p Ola/s została/o w_domu/k.
 *W_klasie/k panuje/o cisza/s.
 *Nie_deptajcie/o trawników/d!
 *Wstęp/s jest_wzbroniony/o.
-*Za_oknem/k jest_ciemno/o.
-*Dzisiaj/k jest_zimno/o.
+*~Za_oknem/k jest_ciemno/o.
+*~Dzisiaj/k jest_zimno/o.
 *Wszędzie/k leży/o śnieg/s.
 *Lekcja/s się_skończyła/o.
 *Palenie/s jest_zabronione/o.
+Na_plaży/k przybyło/o turystów/L.
+W_rzece/k ubyło/o wody/L.
+Zabrakło/o chleba/L w_sklepie/k.
+Nie_było/o Janka/L w_szkole/k.
+W_lesie/k przybyło/o grzybów/L.
+Nie_ma/o mamy/L w_domu/k.
+Zabrakło/o nam/d czasu/L.
+Przybyło/o nowych/a+ uczniów/L.
+W_sklepie/k nie_było/o świeżego/a+ pieczywa/L.
+Nie_było/o nikogo/L w_domu/k.
+Na_łące/k przybyło/o kwiatów/L.
+W_klasie/k zabrakło/o krzeseł/L.
+Nie_ma/o już/k biletów/L na_koncert/a-.
+Zeszłej/a+ zimy/k nie_było/o śniegu/L.
+W_ogrodzie/k nie_ma/o żadnych/a+ owoców/L.
+Tomka/L nie_było/o na_lekcji/k.
+W_szafie/k brakuje/o jednego/a+ kubka/L.
+Ubywa/o wody/L w_studni/k.
+Na_drzewach/k nie_ma/o już/k liści/L.
+Na_niebie/k nie_było/o ani_jednej/a+ chmurki/L.
+Po_burzy/k przybyło/o wody/L w_rzece/k.
+~Wczoraj/k cały/a+ dzień/k lało/o.
+~Latem/k wcześnie/k świta/o.
+~Pod_wieczór/k ochłodziło_się/o.
+~Na_dworze/k szybko/k się_ściemniło/o.
+~Rano/k mocno/k wiało/o.
+~Od_rana/k mży/o.
+~W_nocy/k znowu/k grzmiało/o.
 Spotkajmy_się/o o_17.00/k przy_galerii/k handlowej/a-.
 Maciek/s przygląda_się/o psu/d.
 Pies/s przygląda_się/o Maćkowi/d.
@@ -771,7 +800,8 @@ const TAGS = {
   o:{name:'orzeczenie', lab:'orzecz.', short:'orzecz.', prompt:'Zaznacz <b>orzeczenie</b>', none:null,
      q:'Co robi? Co się z nim dzieje? W jakim jest stanie? Razem z nim zaznacz „nie”, „się” i łącznik („jest”, „był”…).'},
   s:{name:'podmiot', lab:'podmiot', short:'podmiot', prompt:'Zaznacz <b>podmiot</b>', none:'Brak podmiotu – podmiot domyślny',
-     q:'Kto? Co? Wykonawca czynności, zwykle w mianowniku. Jeśli go nie ma, to podmiot domyślny albo zdanie bezpodmiotowe.'},
+     none2:'Brak podmiotu – zdanie bezpodmiotowe',
+     q:'Kto? Co? Wykonawca czynności — zwykle w mianowniku (gramatyczny), czasem w dopełniaczu (logiczny: „Zabrakło chleba”). Jeśli go nie ma: podmiot domyślny („Idę do szkoły”) albo zdanie bezpodmiotowe („Grzmi”).'},
   d:{name:'dopełnienie', lab:'dopełn.', short:'dopełn.', prompt:'Zaznacz wszystkie <b>dopełnienia</b>', none:'Brak dopełnień',
      q:'Kogo? Czego? Komu? Czemu? Kogo? Co? Kim? Czym? O kim? O czym? Uzupełnia czasownik.'},
   k:{name:'okolicznik', lab:'okol.', short:'okol.', prompt:'Zaznacz wszystkie <b>okoliczniki</b>', none:'Brak okoliczników',
@@ -783,20 +813,21 @@ const STEPS = ['o','s','d','k','a'];
 const PUNCT = /([.,!?;:…]*)$/;
 
 function parseSimple(line, idx){
-  let trap = false;
-  if(line.startsWith('*')){ trap = true; line = line.slice(1); }
-  const R = /^(.+?)\/([sodkax])(?::([A-Za-z0-9]+))?(?:([+-]\d*)|>([A-Za-z0-9]+))?([.,!?;:…]*)$/;
+  let trap = false, bezp = false;
+  while(/^[*~]/.test(line)){ if(line[0] === '*') trap = true; else bezp = true; line = line.slice(1); }
+  const R = /^(.+?)\/([sodkaxL])(?::([A-Za-z0-9]+))?(?:([+-]\d*)|>([A-Za-z0-9]+))?([.,!?;:…]*)$/;
   const toks = [], units = [], byG = {};
   line.trim().split(/\s+/).forEach((raw, i) => {
     const m = raw.match(R);
     if(!m) throw new Error(`zdanie ${idx}: nie rozumiem „${raw}”`);
-    const tok = {i, text:m[1].replace(/_/g,' '), punct:m[6]||'', tag:m[2]};
+    const logical = m[2] === 'L';
+    const tok = {i, text:m[1].replace(/_/g,' '), punct:m[6]||'', tag:logical ? 's' : m[2]};
     let u;
     if(m[3] && byG[m[3]]){
       u = byG[m[3]];
       if(u.tag !== tok.tag) throw new Error(`zdanie ${idx}: grupa ${m[3]} ma różne typy`);
     } else {
-      u = {id:units.length, tag:tok.tag, toks:[], spec:null};
+      u = {id:units.length, tag:tok.tag, logical, toks:[], spec:null};
       units.push(u);
       if(m[3]) byG[m[3]] = u;
     }
@@ -826,7 +857,10 @@ function parseSimple(line, idx){
     while(c && c.tag !== 's' && c.tag !== 'o'){ c = units[c.head]; if(++n > 20) break; }
     if(!c || n > 20) throw new Error(`zdanie ${idx}: „${u.text}” nie łączy się z orzeczeniem`);
   });
-  return {kind:'parse', toks, units, trap, oUnit:os[0]};
+  const subs = units.filter(u => u.tag === 's');
+  if(bezp && subs.length) throw new Error(`zdanie ${idx}: bezpodmiotowe z podmiotem`);
+  const subj = subs.length ? (subs[0].logical ? 'logiczny' : 'gramatyczny') : (bezp ? 'bezpodmiotowe' : 'domyślny');
+  return {kind:'parse', toks, units, trap, subj, oUnit:os[0]};
 }
 
 function splitPlain(line){
@@ -874,14 +908,18 @@ PARSED.forEach((p, pi) => p.units.forEach(u => {
   if((u.tag === 'd' || u.tag === 'k') && startsWithPrep(u)) DOPOK.push({p:pi, u:u.id, tag:u.tag});
 }));
 
+/* rodzaj podmiotu */
+const SUBJ = {gramatyczny:[], logiczny:[], 'domyślny':[], bezpodmiotowe:[]};
+PARSED.forEach((p, i) => SUBJ[p.subj].push(i));
+
 /* związki wyrazowe: Z — zgody, R — rządu, P — przynależności */
 const ZW = {Z:[], R:[], P:[]};
 PARSED.forEach((p, pi) => {
-  const subjects = p.units.filter(u => u.tag === 's');
+  const subjects = p.units.filter(u => u.tag === 's' && !u.logical);
   p.units.forEach(u => {
     if(u.head === null) return;
     const h = p.units[u.head];
-    if(u.tag === 's' && subjects.length === 1) ZW.Z.push({p:pi, head:h.id, dep:u.id});
+    if(u.tag === 's' && !u.logical && subjects.length === 1) ZW.Z.push({p:pi, head:h.id, dep:u.id});
     else if(u.tag === 'd' && h.tag === 'o') ZW.R.push({p:pi, head:h.id, dep:u.id});
     else if(u.tag === 'a' && u.spec && u.spec.off > 0 && u.toks.length === 1) ZW.Z.push({p:pi, head:h.id, dep:u.id});
     else if(u.tag === 'k'){
@@ -1043,8 +1081,8 @@ const esc = s => s.replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','
 const STORE = 'pajeczynka-zdania-v1';
 const CATS = [['o','Orzeczenie'],['s','Podmiot'],['d','Dopełnienie'],['k','Okolicznik'],['a','Przydawka'],
   ['rown','Zdanie czy równoważnik'],['zloz','Pojedyncze czy złożone'],['podzial','Zdania składowe'],['typ','Rodzaj złożenia'],
-  ['wsp','Rodzaj współrzędnego'],['przec','Przecinek przed spójnikiem'],['cel','Cel wypowiedzi'],['dopok','Dopełnienie czy okolicznik'],['zwiazek','Związki wyrazowe']];
-const MODES = {parse:.38, dopok:.1, zwiazek:.1, rown:.1, cel:.08, zloz:.16, przec:.08};
+  ['wsp','Rodzaj współrzędnego'],['przec','Przecinek przed spójnikiem'],['cel','Cel wypowiedzi'],['dopok','Dopełnienie czy okolicznik'],['zwiazek','Związki wyrazowe'],['ptyp','Rodzaj podmiotu']];
+const MODES = {parse:.34, podmiot:.08, dopok:.1, zwiazek:.1, rown:.1, cel:.08, zloz:.16, przec:.08};
 
 const S = {score:0, best:0, streak:0, stats:{}, modes:{}};
 try { Object.assign(S, JSON.parse(localStorage.getItem(STORE)) || {}); } catch(e) {}
@@ -1055,7 +1093,7 @@ function save(){ try { localStorage.setItem(STORE, JSON.stringify({score:S.score
 
 let round = 0, T = null, lastKey = null, brush = 1, painting = false, paintVal = 1;
 const pending = [];
-const decks = {p:[], r:[], z:[], c:[], do:[], pr:[]};
+const decks = {p:[], r:[], z:[], c:[], do:[], pr:[], pd:{}};
 function draw(name, size){
   if(!decks[name].length){
     decks[name] = [...Array(size).keys()];
@@ -1064,7 +1102,7 @@ function draw(name, size){
   return decks[name].pop();
 }
 const rnd = a => a[Math.floor(Math.random() * a.length)];
-const modeOf = key => ({p:'parse', r:'rown', rn:'rown', z:'zloz', zn:'zloz', c:'cel', do:'dopok', zw:'zwiazek', pr:'przec'})[key.split(':')[0]];
+const modeOf = key => ({p:'parse', r:'rown', rn:'rown', z:'zloz', zn:'zloz', c:'cel', do:'dopok', zw:'zwiazek', pr:'przec', pd:'podmiot'})[key.split(':')[0]];
 
 function pickKey(){
   round++;
@@ -1079,6 +1117,7 @@ function pickKey(){
     if(mode === 'parse') key = 'p:' + draw('p', PARSED.length);
     else if(mode === 'rown') key = Math.random() < .55 ? 'r:' + draw('r', ROWN.length)
       : 'rn:' + (Math.random() < .5 ? rnd(TRAPS) : rnd(PARSED.map((_, i) => i)));
+    else if(mode === 'podmiot') key = 'pd:' + rnd(SUBJ[rnd(Object.keys(SUBJ))]);
     else if(mode === 'cel') key = 'c:' + draw('c', CEL.length);
     else if(mode === 'dopok') key = 'do:' + draw('do', DOPOK.length);
     else if(mode === 'przec') key = 'pr:' + draw('pr', PRZEC.length);
@@ -1105,6 +1144,7 @@ function makeTask({key, repeat}){
     return {...base, mode:'zloz', item:it, isZ:true, phase:'ask', paint:[], truth:false, wrongW:new Set(),
       stepDefs:[{label:'budowa'}, {label:'podział'}, ...(it.type !== 'M' ? [{label:'rodzaj'}] : [])]};
   }
+  if(k === 'pd') return {...base, mode:'podmiot', item:PARSED[idx], phase:'ask', stepDefs:[{label:'podmiot'}]};
   if(k === 'c') return {...base, mode:'cel', item:CEL[idx], phase:'ask', stepDefs:[{label:'cel'}]};
   if(k === 'do'){
     const x = DOPOK[idx];
@@ -1135,7 +1175,7 @@ function award(ok, cat){
   else { S.streak = 0; schedule(); }
   S.score += d;
   S.best = Math.max(S.best, S.score);
-  T.results.push(ok);
+  T.results[T.step] = (T.results[T.step] === undefined ? true : T.results[T.step]) && ok;
   const del = $('#delta');
   del.className = 'delta';
   void del.offsetWidth;
@@ -1243,7 +1283,7 @@ function start(){
   lastKey = pk.key;
   T = makeTask(pk);
   $('#kind').textContent = {parse:'Części zdania', rown:'Zdanie czy równoważnik?', zloz:'Budowa zdania',
-    cel:'Cel wypowiedzi', dopok:'Wyrażenie przyimkowe', zwiazek:'Związki wyrazowe', przec:'Interpunkcja'}[T.mode];
+    podmiot:'Rodzaj podmiotu', cel:'Cel wypowiedzi', dopok:'Wyrażenie przyimkowe', zwiazek:'Związki wyrazowe', przec:'Interpunkcja'}[T.mode];
   $('#retNote').hidden = !T.repeat;
   feedback('');
   renderSentence();
@@ -1278,13 +1318,22 @@ function renderParse(){
     setActions([{label:'Następne zdanie', primary:true, key:'Enter', onClick:start}]);
     return;
   }
+  if(T.phase === 'stype'){
+    setPrompt('Jaki to <b>podmiot</b>?', PTYP_TIP);
+    setActions([
+      {label:'gramatyczny', choice:true, key:'1', onClick:() => answerStype('gramatyczny')},
+      {label:'logiczny', choice:true, key:'2', onClick:() => answerStype('logiczny')},
+    ]);
+    return;
+  }
   setPrompt(TAGS[cur].prompt, TAGS[cur].q);
   if(T.phase === 'review'){
     setActions([{label:'Dalej', primary:true, key:'Enter', onClick:advanceParse}]);
     return;
   }
   const acts = [{label:'Sprawdź', primary:true, key:'Enter', id:'checkBtn', disabled:!T.sel.size, onClick:() => checkParse(false)}];
-  if(TAGS[cur].none) acts.push({label:TAGS[cur].none, key:'0', onClick:() => checkParse(true)});
+  if(TAGS[cur].none) acts.push({label:TAGS[cur].none, key:'0', onClick:() => checkParse('domyślny')});
+  if(TAGS[cur].none2) acts.push({label:TAGS[cur].none2, key:'9', onClick:() => checkParse('bezpodmiotowe')});
   setActions(acts);
 }
 
@@ -1292,7 +1341,8 @@ function checkParse(none){
   const cur = STEPS[T.step], it = T.item;
   if(none) T.sel.clear();
   const correct = it.units.filter(u => u.tag === cur).map(u => u.id);
-  const ok = correct.length === T.sel.size && correct.every(id => T.sel.has(id));
+  let ok = correct.length === T.sel.size && correct.every(id => T.sel.has(id));
+  if(cur === 's' && !correct.length && typeof none === 'string' && none !== it.subj) ok = false;
   const bonus = award(ok, cur);
   correct.forEach(id => T.labeled.add(id));
   const list = correct.map(id => chip(cur, it.units[id].text)).join(' ');
@@ -1301,12 +1351,15 @@ function checkParse(none){
     feedback(good(bonus ? `Dobrze! Seria ${S.streak}, +${bonus}` : 'Dobrze!') + (correct.length ? list : `<span>w tym zdaniu nie ma ${plural}.</span>`));
     T.sel.clear();
     revealTree(T.labeled);
+    if(cur === 's' && !correct.length) feedback($('#feedback').innerHTML.replace(/<span>w tym zdaniu nie ma podmiotu\.<\/span>/, `<span>${SUBJ_WHY[it.subj](it)}</span>`));
+    if(cur === 's' && correct.length && (it.subj === 'logiczny' || Math.random() < .4)){ T.phase = 'stype'; render(); return; }
     advanceParse();
   } else {
     T.miss = new Set([...T.sel].filter(id => !correct.includes(id)));
     T.sel.clear();
-    const extra = cur === 's' && !correct.length ? ' (podmiot domyślny lub zdanie bezpodmiotowe)' : '';
-    feedback(bad('Nie tym razem.') + (correct.length ? `<span>Poprawnie:</span> ${list}` : `<span>W tym zdaniu nie ma ${plural}${extra}.</span>`));
+    const noneMsg = cur === 's' ? SUBJ_WHY[it.subj](it) : `W tym zdaniu nie ma ${plural}.`;
+    feedback(bad('Nie tym razem.') + (correct.length ? `<span>Poprawnie:</span> ${list}` : `<span>${noneMsg}</span>`)
+      + (cur === 's' && it.subj === 'logiczny' ? '<span>To podmiot logiczny (w dopełniaczu).</span>' : ''));
     revealTree(T.labeled);
     T.phase = 'review';
     render();
@@ -1320,6 +1373,21 @@ function advanceParse(){
   if(T.phase === 'done') T.item.units.forEach(u => u.tag !== 'x' && T.labeled.add(u.id));
   revealTree(T.labeled);
   render();
+}
+
+const PTYP_TIP = 'Gramatyczny stoi w mianowniku (kto? co?). Logiczny stoi w dopełniaczu (kogo? czego?) przy orzeczeniach typu: nie ma, nie było, zabrakło, przybyło, ubyło.';
+const SUBJ_WHY = {
+  gramatyczny:it => `Podmiot gramatyczny „${esc(it.units.find(u => u.tag === 's').text)}” stoi w mianowniku.`,
+  logiczny:it => `Podmiot logiczny „${esc(it.units.find(u => u.tag === 's').text)}” stoi w dopełniaczu.`,
+  'domyślny':it => `Podmiotu nie ma w zdaniu, ale domyślamy się go z formy orzeczenia „${esc(it.oUnit.text)}” — to podmiot domyślny.`,
+  bezpodmiotowe:it => `Orzeczenie „${esc(it.oUnit.text)}” nie wskazuje żadnego wykonawcy — to zdanie bezpodmiotowe.`,
+};
+function answerStype(v){
+  const ok = v === T.item.subj;
+  award(ok, 'ptyp');
+  feedback((ok ? good('Dobrze!') : bad('Nie tym razem.')) + `<span>${SUBJ_WHY[T.item.subj](T.item)}</span>`);
+  if(ok) advanceParse();
+  else { T.phase = 'review'; render(); }
 }
 
 /* ---------- równoważnik ---------- */
@@ -1464,6 +1532,15 @@ function showFullTree(){
 }
 const ZW_NAMES = {Z:'zgody', R:'rządu', P:'przynależności'};
 const QUIZ = {
+  podmiot:{
+    cat:'ptyp', prompt:'Jaki <b>podmiot</b> ma to zdanie?',
+    hint:() => PTYP_TIP + ' Domyślny: nie ma go w zdaniu, ale wiadomo, kto działa. Zdanie bezpodmiotowe: nie da się wskazać wykonawcy.',
+    choices:[['gramatyczny', 'gramatyczny'], ['logiczny', 'logiczny'], ['domyślny', 'domyślny'], ['bezpodmiotowe', 'brak – zdanie bezpodmiotowe']],
+    answer:() => T.item.subj,
+    title:() => T.item.subj === 'bezpodmiotowe' ? 'Zdanie <b>bezpodmiotowe</b>' : 'Podmiot <b>' + T.item.subj + '</b>',
+    explain:() => SUBJ_WHY[T.item.subj](T.item),
+    after:showFullTree,
+  },
   cel:{
     cat:'cel', prompt:'Jakie to wypowiedzenie ze względu na <b>cel wypowiedzi</b>?', hint:() => 'Czy autor informuje, pyta, czy wydaje polecenie?',
     choices:[['O', 'oznajmujące'], ['P', 'pytające'], ['R', 'rozkazujące']],
