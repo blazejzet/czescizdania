@@ -249,8 +249,13 @@ h3{margin:0; font:600 1.1rem var(--f-text)}
         <label><input type="checkbox" id="mode-cel" checked> cel wypowiedzi</label>
         <label><input type="checkbox" id="mode-dopok" checked> dopełnienie czy okolicznik</label>
         <label><input type="checkbox" id="mode-zwiazek" checked> związki wyrazowe</label>
+        <label><input type="checkbox" id="mode-grupa" checked> grupa podmiotu</label>
+        <label><input type="checkbox" id="mode-czmowy" checked> część mowy podmiotu</label>
+        <label><input type="checkbox" id="mode-defs" checked> definicje</label>
+        <label><input type="checkbox" id="mode-transf" checked> przekształcanie na równoważnik</label>
       </fieldset>
       <button class="link-btn" id="reset">Wyzeruj wyniki</button>
+      <button class="link-btn" id="onlyNote">Tylko zagadnienia z kartki</button>
     </div>
   </section>
 </div>
@@ -980,6 +985,87 @@ ZLOZ.forEach((z, zi) => {
   });
 });
 
+const shuffle = arr => {
+  const a = [...arr];
+  for(let i = a.length - 1; i > 0; i--){ const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
+  return a;
+};
+
+/* grupa podmiotu — podmiot razem z przydawkami, które go określają */
+const GRUPA = PARSED.map((p, i) => p.units.some(u => u.tag === 's') ? i : -1).filter(i => i >= 0);
+function subjectGroupIds(item){
+  const s = item.units.find(u => u.tag === 's');
+  const ids = new Set([s.id]);
+  let changed = true;
+  while(changed){
+    changed = false;
+    item.units.forEach(u => {
+      if(u.tag === 'a' && !ids.has(u.id) && u.head !== null && ids.has(u.head)){ ids.add(u.id); changed = true; }
+    });
+  }
+  return ids;
+}
+
+/* jaką częścią mowy jest wyrażony podmiot */
+const CZMOWY_DATA = [
+  ['Kasia czyta ciekawą książkę.', 'Kasia', 'rzeczownik', '„Kasia” to rzeczownik – nazywa osobę.'],
+  ['Kot śpi na kanapie.', 'Kot', 'rzeczownik', '„Kot” to rzeczownik – nazywa zwierzę.'],
+  ['Wiatr zerwał dach.', 'Wiatr', 'rzeczownik', '„Wiatr” to rzeczownik – nazywa zjawisko przyrody.'],
+  ['Stół stoi pod oknem.', 'Stół', 'rzeczownik', '„Stół” to rzeczownik – nazywa rzecz.'],
+  ['Radość rozpierała dzieci.', 'Radość', 'rzeczownik', '„Radość” to rzeczownik – nazywa uczucie (pojęcie abstrakcyjne).'],
+  ['Kto zjadł ostatnie ciastko?', 'Kto', 'zaimek', '„Kto” to zaimek pytający – zastępuje nazwę osoby.'],
+  ['Ona zawsze się spóźnia.', 'Ona', 'zaimek', '„Ona” to zaimek osobowy – zastępuje rzeczownik.'],
+  ['Nikt nie odpowiedział na pytanie.', 'Nikt', 'zaimek', '„Nikt” to zaimek – zastępuje (brak) nazwy osoby.'],
+  ['Coś zaszeleściło w krzakach.', 'Coś', 'zaimek', '„Coś” to zaimek nieokreślony – zastępuje nazwę rzeczy.'],
+  ['Dwoje dzieci bawiło się w parku.', 'Dwoje', 'liczebnik', '„Dwoje” to liczebnik zbiorowy – to on jest głównym elementem podmiotu, a „dzieci” w dopełniaczu go uzupełnia.'],
+  ['Pięciu chłopców grało w piłkę.', 'Pięciu', 'liczebnik', '„Pięciu” to liczebnik – odpowiada na pytanie ile?.'],
+  ['Chorzy czekali cierpliwie w poczekalni.', 'Chorzy', 'przymiotnik', '„Chorzy” to przymiotnik użyty w znaczeniu rzeczownika (nazywa ludzi chorych).'],
+  ['Najstarszy wygrał zawody.', 'Najstarszy', 'przymiotnik', '„Najstarszy” to przymiotnik w stopniu najwyższym, użyty jako rzeczownik.'],
+];
+const CZMOWY = CZMOWY_DATA.map(([text, subjectWord, pos, explain]) => ({kind:'r', words:splitPlain(text), subjectWord, pos, explain}));
+
+/* pytania o to, czym są podmiot i orzeczenie */
+const DEFS = [
+  {q:'Na jakie pytania odpowiada <b>podmiot</b>?', choices:[[0,'kto? co?'],[1,'komu? czemu?'],[2,'gdzie? kiedy?'],[3,'jaki? który?']], answer:0,
+    explain:'Podmiot odpowiada na pytania kto? co? – wskazuje wykonawcę czynności lub to, o czym mowa w zdaniu.'},
+  {q:'Na jakie pytania odpowiada <b>orzeczenie</b>?', choices:[[0,'co robi? co się z nim dzieje? w jakim jest stanie?'],[1,'kto? co?'],[2,'czyj?'],[3,'ile?']], answer:0,
+    explain:'Orzeczenie mówi, co robi podmiot, co się z nim dzieje albo w jakim jest stanie.'},
+  {q:'Czym jest <b>orzeczenie</b>?', choices:[[0,'najważniejszą częścią zdania – mówi, co robi podmiot'],[1,'częścią zdania, która określa rzeczownik'],[2,'tym samym co podmiot']], answer:0,
+    explain:'Orzeczenie to najważniejsza część zdania – bez niego nie ma zdania. Razem z podmiotem tworzy związek główny.'},
+  {q:'Jaki związek tworzą <b>podmiot i orzeczenie</b>?', choices:[[0,'związek główny'],[1,'związek poboczny rządu'],[2,'związek poboczny przynależności']], answer:0,
+    explain:'Podmiot i orzeczenie tworzą związek główny zdania – zgadzają się w liczbie i osobie (a często w rodzaju).'},
+  {q:'Czym jest <b>podmiot gramatyczny</b>?', choices:[[0,'podmiotem w mianowniku (kto? co?)'],[1,'podmiotem w dopełniaczu'],[2,'zdaniem bez podmiotu']], answer:0,
+    explain:'Podmiot gramatyczny stoi w mianowniku, np. „Naukowiec podjął decyzję”.'},
+  {q:'Czym jest <b>podmiot logiczny</b>?', choices:[[0,'podmiotem w dopełniaczu, celowniku lub narzędniku'],[1,'podmiotem w mianowniku'],[2,'brakiem podmiotu']], answer:0,
+    explain:'Podmiot logiczny nie stoi w mianowniku, np. „Brakowało dowodów”, „Dziecku jest zimno”.'},
+  {q:'Czym jest <b>podmiot domyślny</b>?', choices:[[0,'podmiotem, którego nie ma w zdaniu, ale wynika z końcówki orzeczenia'],[1,'podmiotem bezosobowym'],[2,'podmiotem w liczbie mnogiej']], answer:0,
+    explain:'Podmiotu domyślnego nie ma w zdaniu, ale wiadomo, kto działa, po formie orzeczenia, np. „Idę do szkoły” (ja).'},
+  {q:'Kiedy zdanie jest <b>bezpodmiotowe</b>?', choices:[[0,'gdy nie da się wskazać wykonawcy czynności, np. „Grzmi”'],[1,'gdy podmiot jest domyślny'],[2,'gdy w zdaniu nie ma orzeczenia']], answer:0,
+    explain:'Zdanie bezpodmiotowe nie ma i nie może mieć podmiotu – nie wskazuje żadnego wykonawcy.'},
+  {q:'Czym jest <b>grupa podmiotu</b>?', choices:[[0,'podmiotem razem z przydawkami, które go określają'],[1,'samym podmiotem, bez żadnych określeń'],[2,'podmiotem razem z orzeczeniem']], answer:0,
+    explain:'Grupa podmiotu to podmiot wraz ze wszystkimi przydawkami, które go opisują, np. „Mały chłopiec” w zdaniu „Mały chłopiec kopie piłkę”.'},
+  {q:'Jakie są rodzaje <b>orzeczenia</b>?', choices:[[0,'czasownikowe i imienne'],[1,'proste i złożone'],[2,'gramatyczne i logiczne']], answer:0,
+    explain:'Orzeczenie czasownikowe to sama osobowa forma czasownika (np. „pisze”). Orzeczenie imienne składa się z łącznika (np. „jest”, „został”) i orzecznika (np. „jest miła”).'},
+  {q:'Zdanie czy <b>równoważnik zdania</b> – co odróżnia jedno od drugiego?', choices:[[0,'obecność osobowej formy czasownika (orzeczenia)'],[1,'obecność podmiotu'],[2,'długość wypowiedzenia']], answer:0,
+    explain:'Zdanie ma orzeczenie wyrażone osobową formą czasownika. Równoważnik zdania takiej formy nie ma, choć przekazuje pełną myśl, np. „Cisza!”.'},
+];
+
+/* przekształcanie zdań na równoważniki */
+const TRANSF = [
+  ['Zachowajcie ciszę!', 'Cisza!', ['Jest głośno.', 'Cisza mnie denerwuje.']],
+  ['Wstęp jest wzbroniony.', 'Wstęp wzbroniony.', ['Wstęp jest dozwolony.', 'Wchodzenie jest trudne.']],
+  ['Zabrania się tu palić.', 'Zakaz palenia.', ['Pali się dom.', 'Palenie jest przyjemne.']],
+  ['Mama jest w pracy.', 'Mama w pracy.', ['Mama wróciła z pracy.', 'Mama pracuje w sklepie.']],
+  ['Na dworze jest mróz.', 'Na dworze mróz.', ['Na dworze jest ciepło.', 'Zimą pada śnieg.']],
+  ['Życzę ci dobrego dnia.', 'Dzień dobry!', ['Mam dziś dobry dzień.', 'Dzisiaj jest dobry dzień.']],
+  ['W budynku wybuchł pożar!', 'Pożar!', ['Strażacy gaszą ogień.', 'Budynek spłonął doszczętnie.']],
+  ['Sklep jest zamknięty.', 'Sklep zamknięty.', ['Sklep jest otwarty.', 'Sklep zostanie zamknięty jutro.']],
+  ['Nad morzem jest piękna pogoda.', 'Nad morzem piękna pogoda.', ['Nad morzem pada deszcz.', 'Jedziemy nad morze.']],
+  ['Żegnam się z tobą.', 'Do widzenia.', ['Widzimy się jutro.', 'Do zobaczenia wkrótce.']],
+  ['Życzę ci smacznego posiłku.', 'Smacznego!', ['Obiad jest smaczny.', 'Zjadłem smaczny obiad.']],
+  ['Wołam o pomoc!', 'Na pomoc!', ['Pomagam sąsiadowi.', 'Otrzymałem pomoc od kolegi.']],
+].map(([full, equiv, distractors]) => ({full, equiv, distractors}));
+
 /* ---------- SVG ---------- */
 const NS = 'http://www.w3.org/2000/svg';
 function svgEl(tag, attrs, parent){
@@ -1131,8 +1217,12 @@ const esc = s => s.replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','
 const STORE = 'pajeczynka-zdania-v1';
 const CATS = [['o','Orzeczenie'],['s','Podmiot'],['d','Dopełnienie'],['k','Okolicznik'],['a','Przydawka'],
   ['rown','Zdanie czy równoważnik'],['zloz','Pojedyncze czy złożone'],['podzial','Zdania składowe'],['typ','Rodzaj złożenia'],
-  ['wsp','Rodzaj współrzędnego'],['przec','Przecinek przed spójnikiem'],['cel','Cel wypowiedzi'],['dopok','Dopełnienie czy okolicznik'],['zwiazek','Związki wyrazowe'],['ptyp','Rodzaj podmiotu'],['wykres','Wykres zdania']];
-const MODES = {parse:.28, wykres:.08, podmiot:.08, dopok:.1, zwiazek:.1, rown:.1, cel:.08, zloz:.16, przec:.08};
+  ['wsp','Rodzaj współrzędnego'],['przec','Przecinek przed spójnikiem'],['cel','Cel wypowiedzi'],['dopok','Dopełnienie czy okolicznik'],['zwiazek','Związki wyrazowe'],['ptyp','Rodzaj podmiotu'],['wykres','Wykres zdania'],
+  ['grupa','Grupa podmiotu'],['czmowy','Część mowy podmiotu'],['defs','Definicje'],['transf','Przekształcanie na równoważnik']];
+const MODES = {parse:.28, wykres:.08, podmiot:.08, dopok:.1, zwiazek:.1, rown:.1, cel:.08, zloz:.16, przec:.08, grupa:.07, czmowy:.06, defs:.05, transf:.05};
+/* zestaw zadań z notatki „NA sprawdzenie” (IMG_1013): podmiot i orzeczenie, ich rodzaje, grupa podmiotu,
+   część mowy podmiotu, związki wyrazowe, wypowiedzenia i równoważniki zdań */
+const NOTE_MODES = ['parse', 'podmiot', 'grupa', 'czmowy', 'zwiazek', 'rown', 'defs', 'transf'];
 
 const S = {score:0, best:0, streak:0, stats:{}, modes:{}};
 try { Object.assign(S, JSON.parse(localStorage.getItem(STORE)) || {}); } catch(e) {}
@@ -1143,7 +1233,7 @@ function save(){ try { localStorage.setItem(STORE, JSON.stringify({score:S.score
 
 let round = 0, T = null, lastKey = null, brush = 1, painting = false, paintVal = 1;
 const pending = [];
-const decks = {p:[], r:[], z:[], c:[], do:[], pr:[], pd:{}};
+const decks = {p:[], r:[], z:[], c:[], do:[], pr:[], pd:{}, gr:[], cm:[], df:[], tr:[]};
 function draw(name, size){
   if(!decks[name].length){
     decks[name] = [...Array(size).keys()];
@@ -1152,7 +1242,7 @@ function draw(name, size){
   return decks[name].pop();
 }
 const rnd = a => a[Math.floor(Math.random() * a.length)];
-const modeOf = key => ({p:'parse', r:'rown', rn:'rown', z:'zloz', zn:'zloz', c:'cel', do:'dopok', zw:'zwiazek', pr:'przec', pd:'podmiot', wy:'wykres'})[key.split(':')[0]];
+const modeOf = key => ({p:'parse', r:'rown', rn:'rown', z:'zloz', zn:'zloz', c:'cel', do:'dopok', zw:'zwiazek', pr:'przec', pd:'podmiot', wy:'wykres', gr:'grupa', cm:'czmowy', df:'defs', tr:'transf'})[key.split(':')[0]];
 
 function pickKey(){
   round++;
@@ -1176,6 +1266,10 @@ function pickKey(){
       const pool = ZW[rnd(['Z', 'R', 'P'])], x = rnd(pool);
       key = 'zw:' + ZW_ALL.findIndex(y => y.p === x.p && y.dep === x.dep);
     }
+    else if(mode === 'grupa') key = 'gr:' + GRUPA[draw('gr', GRUPA.length)];
+    else if(mode === 'czmowy') key = 'cm:' + draw('cm', CZMOWY.length);
+    else if(mode === 'defs') key = 'df:' + draw('df', DEFS.length);
+    else if(mode === 'transf') key = 'tr:' + draw('tr', TRANSF.length);
     else key = Math.random() < .62 ? 'z:' + draw('z', ZLOZ.length)
       : 'zn:' + (Math.random() < .6 ? rnd(TRICKY) : Math.floor(Math.random() * PARSED.length));
     if(key !== lastKey) break;
@@ -1213,6 +1307,13 @@ function makeTask({key, repeat}){
   if(k === 'pr'){
     const x = PRZEC[idx];
     return {...base, mode:'przec', item:ZLOZ[x.z], gap:x, phase:'ask', paint:[], truth:false, wrongW:new Set(), stepDefs:[{label:'przecinek'}]};
+  }
+  if(k === 'gr') return {...base, mode:'grupa', item:PARSED[idx], phase:'select', stepDefs:[{label:'grupa podmiotu'}]};
+  if(k === 'cm') return {...base, mode:'czmowy', item:CZMOWY[idx], phase:'ask', stepDefs:[{label:'część mowy'}]};
+  if(k === 'df') return {...base, mode:'defs', item:{...DEFS[idx], kind:'r', words:[]}, phase:'ask', stepDefs:[{label:'definicja'}]};
+  if(k === 'tr'){
+    const d = TRANSF[idx];
+    return {...base, mode:'transf', item:{...d, kind:'r', words:splitPlain(d.full), opts:shuffle([d.equiv, ...d.distractors])}, phase:'ask', stepDefs:[{label:'równoważnik'}]};
   }
   return {...base, mode:'zloz', item:PARSED[idx], isZ:false, phase:'ask', stepDefs:[{label:'budowa'}]};
 }
@@ -1308,7 +1409,7 @@ function updateSentence(){
     const i = +el.dataset.i;
     if(it.kind === 'parse'){
       const tok = it.toks[i], u = it.units[tok.unit];
-      el.classList.toggle('click', T.mode === 'parse' && T.phase === 'select' && u.tag !== 'x' && !T.labeled.has(u.id));
+      el.classList.toggle('click', (T.mode === 'parse' && T.phase === 'select' && u.tag !== 'x' && !T.labeled.has(u.id)) || (T.mode === 'grupa' && T.phase === 'select' && u.tag !== 'x'));
       el.classList.toggle('sel', T.sel.has(u.id));
       el.classList.toggle('miss', T.miss.has(u.id));
       el.classList.toggle('hl-dep', (T.mode === 'dopok' && T.target.u === u.id) || (T.mode === 'zwiazek' && T.pair.dep === u.id));
@@ -1339,7 +1440,8 @@ function start(){
   lastKey = pk.key;
   T = makeTask(pk);
   $('#kind').textContent = {parse:'Części zdania', rown:'Zdanie czy równoważnik?', zloz:'Budowa zdania',
-    wykres:'Wykres zdania', podmiot:'Rodzaj podmiotu', cel:'Cel wypowiedzi', dopok:'Wyrażenie przyimkowe', zwiazek:'Związki wyrazowe', przec:'Interpunkcja'}[T.mode];
+    wykres:'Wykres zdania', podmiot:'Rodzaj podmiotu', cel:'Cel wypowiedzi', dopok:'Wyrażenie przyimkowe', zwiazek:'Związki wyrazowe', przec:'Interpunkcja',
+    grupa:'Grupa podmiotu', czmowy:'Część mowy podmiotu', defs:'Definicje', transf:'Przekształcanie na równoważnik'}[T.mode];
   $('#retNote').hidden = !T.repeat;
   feedback('');
   renderSentence();
@@ -1351,6 +1453,8 @@ function start(){
     drawUserGraph();
   } else if(T.mode === 'rown'){
     graphEmpty('Odpowiedz, a zobaczysz wyjaśnienie.', '');
+  } else if(T.mode === 'grupa'){
+    graphEmpty('Zaznacz grupę podmiotu w zdaniu.', '');
   } else {
     graphEmpty('Odpowiedz, a zobaczysz budowę zdania.', '');
   }
@@ -1360,6 +1464,7 @@ function start(){
 function render(){
   renderSteps();
   if(T.mode === 'parse') renderParse();
+  else if(T.mode === 'grupa') renderGrupa();
   else if(T.mode === 'rown') renderRown();
   else if(T.mode === 'zloz') renderZloz();
   else if(T.mode === 'wykres') renderWykres();
@@ -1477,6 +1582,28 @@ function answerRown(saysR){
     $('#graphSub').textContent = 'pełny rozbiór tego zdania';
   }
   if(!ok) feedback($('#feedback').innerHTML + '<span>Wróci za kilka przykładów.</span>');
+  render();
+}
+
+/* ---------- grupa podmiotu ---------- */
+function renderGrupa(){
+  if(T.phase === 'review'){
+    setPrompt('<b>Grupa podmiotu</b>', '', T.failed ? 'To zdanie wróci za kilka przykładów.' : '');
+    setActions([{label:'Dalej', primary:true, key:'Enter', onClick:start}]);
+    return;
+  }
+  setPrompt('Zaznacz <b>grupę podmiotu</b>', 'Grupa podmiotu to podmiot razem ze wszystkimi przydawkami, które go określają.');
+  setActions([{label:'Sprawdź', primary:true, key:'Enter', id:'checkBtn', disabled:!T.sel.size, onClick:checkGrupa}]);
+}
+function checkGrupa(){
+  const it = T.item, correct = subjectGroupIds(it), chosen = new Set(T.sel);
+  const ok = correct.size === chosen.size && [...correct].every(id => chosen.has(id));
+  award(ok, 'grupa');
+  T.miss = new Set([...chosen].filter(id => !correct.has(id)));
+  T.sel = correct;
+  const list = [...correct].sort((a, b) => a - b).map(id => chip('s', it.units[id].text)).join(' ');
+  feedback((ok ? good('Dobrze!') : bad('Nie tym razem.')) + `<span>Grupa podmiotu:</span> ${list}`);
+  T.phase = 'review';
   render();
 }
 
@@ -1651,12 +1778,38 @@ const QUIZ = {
     },
     after:() => { T.truth = true; buildClauses(T.item); $('#graphSub').textContent = 'zdania składowe'; },
   },
+  czmowy:{
+    cat:'czmowy', prompt:'Jaką <b>częścią mowy</b> jest wyrażony podmiot w tym zdaniu?',
+    hint:() => 'Rzeczownik: kto? co? (osoba, zwierzę, rzecz, zjawisko). Zaimek zastępuje rzeczownik (kto, coś, on…). Liczebnik odpowiada na pytanie ile? i rządzi dopełniaczem (np. „Dwoje dzieci…”). Czasem podmiotem bywa przymiotnik użyty w znaczeniu rzeczownika (np. „Chorzy czekali…”).',
+    info:() => `podmiot: ${chipN(T.item.subjectWord)}`,
+    choices:[['rzeczownik', 'rzeczownik'], ['zaimek', 'zaimek'], ['liczebnik', 'liczebnik'], ['przymiotnik', 'przymiotnik']],
+    answer:() => T.item.pos,
+    title:() => 'Podmiot wyrażony jest <b>' + {rzeczownik:'rzeczownikiem', zaimek:'zaimkiem', liczebnik:'liczebnikiem', przymiotnik:'przymiotnikiem'}[T.item.pos] + '</b>',
+    explain:() => T.item.explain,
+  },
+  defs:{
+    cat:'defs', prompt:() => T.item.q, hint:() => '',
+    choices:() => T.item.choices,
+    answer:() => T.item.answer,
+    title:() => T.item.choices.find(([v]) => v === T.item.answer)[1],
+    explain:() => T.item.explain,
+  },
+  transf:{
+    cat:'transf', prompt:'Który <b>równoważnik zdania</b> ma to samo znaczenie, co poniższe zdanie?',
+    hint:() => 'Równoważnik zdania nie ma osobowej formy czasownika, ale przekazuje ten sam sens.',
+    choices:() => T.item.opts.map(o => [o, o]),
+    answer:() => T.item.equiv,
+    title:() => 'Równoważnik: <b>' + esc(T.item.equiv) + '</b>',
+    explain:() => `Zdanie „${esc(T.item.full)}” i równoważnik „${esc(T.item.equiv)}” znaczą to samo, ale równoważnik nie ma osobowej formy czasownika.`,
+  },
 };
 function renderQuiz(){
   const q = QUIZ[T.mode];
+  const prompt = typeof q.prompt === 'function' ? q.prompt() : q.prompt;
+  const choices = typeof q.choices === 'function' ? q.choices() : q.choices;
   if(T.phase === 'ask'){
-    setPrompt(q.prompt, q.hint(), q.info ? q.info() : '');
-    setActions(q.choices.map(([v, l], i) => ({label:l, choice:true, key:String(i + 1), onClick:() => answerQuiz(v)})));
+    setPrompt(prompt, q.hint(), q.info ? q.info() : '');
+    setActions(choices.map(([v, l], i) => ({label:l, choice:true, key:String(i + 1), onClick:() => answerQuiz(v)})));
   } else {
     setPrompt(q.title(), '', T.failed ? 'To zadanie wróci za kilka przykładów.' : '');
     setActions([{label:'Dalej', primary:true, key:'Enter', onClick:start}]);
@@ -1876,9 +2029,9 @@ $$('.brush').forEach(el => el.addEventListener('click', () => setBrush(+el.datas
 const sentenceEl = $('#sentence');
 sentenceEl.addEventListener('click', e => {
   const w = e.target.closest('.w');
-  if(!w || !T || T.mode !== 'parse' || T.phase !== 'select') return;
+  if(!w || !T || !(T.mode === 'parse' || T.mode === 'grupa') || T.phase !== 'select') return;
   const tok = T.item.toks[+w.dataset.i], u = T.item.units[tok.unit];
-  if(u.tag === 'x' || T.labeled.has(u.id)) return;
+  if(u.tag === 'x' || (T.mode === 'parse' && T.labeled.has(u.id))) return;
   T.sel.has(u.id) ? T.sel.delete(u.id) : T.sel.add(u.id);
   updateSentence();
   const btn = $('#checkBtn'); if(btn) btn.disabled = !T.sel.size;
@@ -1931,6 +2084,14 @@ $('#reset').addEventListener('click', () => {
   S.score = 0; S.best = 0; S.streak = 0;
   CATS.forEach(([k]) => S.stats[k] = [0, 0]);
   save(); renderHeader(); renderStats();
+});
+$('#onlyNote').addEventListener('click', () => {
+  Object.keys(MODES).forEach(m => {
+    S.modes[m] = NOTE_MODES.includes(m);
+    const cb = $('#mode-' + m); if(cb) cb.checked = S.modes[m];
+  });
+  save();
+  if(T && !S.modes[T.mode] && (T.phase === 'ask' || T.phase === 'select') && !T.results.length) start();
 });
 
 renderHeader();
